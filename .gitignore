@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# Django
+*.sqlite3
+db.sqlite3
+staticfiles/
+
+# Docker
+# (keep Dockerfile, docker-compose.yml, .dockerignore — those are source)
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.log
+
+# Env
+.env
+.env.*
