@@ -1,6 +1,8 @@
 resource "hcloud_ssh_key" "default" {
-  name       = "${var.name}-admin"
-  public_key = file(var.ssh_public_key_path)
+  name = "${var.name}-admin"
+  # trimspace: .pub files end with a newline that Hetzner doesn't store, which would
+  # otherwise look like a different key and force a replacement.
+  public_key = trimspace(file(var.ssh_public_key_path))
 }
 
 resource "hcloud_firewall" "web" {
