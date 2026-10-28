@@ -4,7 +4,7 @@ A one-page portfolio site. Django renders the page from content stored in Postgr
 you edit that content in the Django admin. The page's tabs and filter chips use a small
 plain-JavaScript file; there is no frontend framework and no build step.
 
-**Stack:** Python 3.11, Django 5, PostgreSQL 16, gunicorn, whitenoise, Docker Compose.
+**Stack:** Python 3.13, Django 5, PostgreSQL 16, gunicorn, whitenoise, Docker Compose.
 
 ## Run it
 

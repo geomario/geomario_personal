@@ -4,7 +4,7 @@
 
 Mario's one-page portfolio site. Django 5 (one app, `portfolio`), server-rendered
 templates, plain JavaScript (no framework, no build step), PostgreSQL 16, served by
-gunicorn + whitenoise, run with Docker Compose. Python 3.11.
+gunicorn + whitenoise, run with Docker Compose. Python 3.13.
 
 Content (focus areas, projects, posts, timeline) lives in the database and is edited in
 `/admin`. `portfolio/data.py` is starter content only: `load_initial_data` copies it into

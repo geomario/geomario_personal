@@ -1,4 +1,4 @@
-FROM python:3.11-alpine
+FROM python:3.13-alpine
 LABEL maintainer="Mario Ramirez marm1984@gmail.com"
 
 # Set environment variables
