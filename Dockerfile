@@ -8,6 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
 
 # Install dependencies first
 COPY ./requirements.txt /requirements.txt
+COPY ./requirements.dev.txt /requirements.dev.txt
 
 ARG DEV=0
 # psycopg[binary] ships prebuilt wheels, so no compiler or libpq headers are needed.
@@ -15,7 +16,7 @@ RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     apk add --update --no-cache postgresql-client && \
     /py/bin/pip install -r /requirements.txt && \
-    if [ "$DEV" = "1" ]; then /py/bin/pip install flake8; fi
+    if [ "$DEV" = "1" ]; then /py/bin/pip install -r /requirements.dev.txt; fi
 
 # Create unprivileged user
 RUN adduser \
@@ -30,11 +31,12 @@ COPY ./portfolio /app/portfolio/
 COPY ./scripts /scripts/
 
 # Static files only change with the code, so collect them once at build time
-# instead of on every container start.
+# instead of on every container start. They go to /vol/static (STATIC_ROOT),
+# outside /app, so the dev bind mount over /app doesn't hide them.
 RUN /py/bin/python /app/manage.py collectstatic --noinput && \
     chmod +x /scripts/run.sh && \
     chmod -R 755 /scripts /app && \
-    chown -R mario-user:mario-user /app
+    chown -R mario-user:mario-user /app /vol
 
 WORKDIR /app
 

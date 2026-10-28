@@ -1,50 +1,49 @@
+# Local development. Production: docker-compose.deploy.yml.
 services:
+  app:
+    build:
+      context: .
+      args:
+        - DEV=1
+    image: mario-portfolio:dev
+    container_name: mario-portfolio
+    ports:
+      - "8000:8000"
+    # Code is mounted, so edits show up without rebuilding.
+    volumes:
+      - .:/app
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py load_initial_data &&
+             python manage.py ensure_superuser &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DJANGO_DEBUG=1
+      - DB_HOST=db
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DJANGO_SUPERUSER_USER=${DJANGO_SUPERUSER_USER:-}
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD:-}
+    depends_on:
+      db:
+        condition: service_healthy
+
   db:
     image: postgres:16-alpine
     container_name: mario-portfolio-db
     environment:
-      - POSTGRES_DB=${DB_NAME:-postgres}
-      - POSTGRES_USER=${DB_USER:-postgres}
-      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
-    restart: unless-stopped
-
-  web:
-    build:
-      context: .
-      args:
-        DEV: 0
-    image: mario-portfolio:latest
-    container_name: mario-portfolio
-    depends_on:
-      db:
-        condition: service_healthy
-    ports:
-      - "8000:8000"
-    environment:
-      - PORT=8000
-      - GUNICORN_WORKERS=2
-      - DJANGO_DEBUG=${DJANGO_DEBUG:-1}
-      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dev-secret-key-change-me}
-      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS:-*}
-      - DJANGO_CSRF_TRUSTED_ORIGINS=${DJANGO_CSRF_TRUSTED_ORIGINS:-}
-      - DJANGO_BEHIND_HTTPS_PROXY=${DJANGO_BEHIND_HTTPS_PROXY:-0}
-      - DJANGO_HSTS_SECONDS=${DJANGO_HSTS_SECONDS:-0}
-      - DB_NAME=${DB_NAME:-postgres}
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD:-postgres}
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DJANGO_SUPERUSER_USER=${DJANGO_SUPERUSER_USER:-}
-      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL:-}
-      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD:-}
-    restart: unless-stopped
 
 volumes:
   postgres_data:

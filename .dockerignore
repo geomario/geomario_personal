@@ -5,4 +5,8 @@ __pycache__/
 .git/
 *.log
 Dockerfile
-docker-compose.yml
+docker-compose*.yml
+.env
+.env.*
+.github/
+docker/

@@ -4,11 +4,15 @@ A one-page portfolio site. Django renders the page from content stored in Postgr
 you edit that content in the Django admin. The page's tabs and filter chips use a small
 plain-JavaScript file; there is no frontend framework and no build step.
 
-**Stack:** Python 3.13, Django 5, PostgreSQL 16, gunicorn, whitenoise, Docker Compose.
+**Stack:** Python 3.13, Django 5, PostgreSQL 16, gunicorn, whitenoise, nginx + Let's
+Encrypt (production), Docker Compose.
 
-## Run it
+| File | Use |
+| --- | --- |
+| `docker-compose.yml` | Local development: code mounted, Django's dev server, debug on |
+| `docker-compose.deploy.yml` | Production: gunicorn behind an nginx proxy with HTTPS, settings from `.env` |
 
-Docker is the supported way to run the site:
+## Develop
 
 ```bash
 docker compose up --build
@@ -16,45 +20,79 @@ docker compose up --build
 
 Then open <http://localhost:8000/> (the site) and <http://localhost:8000/admin/> (the admin).
 
-On every start, the container:
+The code is mounted into the container and Django's dev server reloads on changes, so you
+only need `--build` again after changing `requirements*.txt` or the `Dockerfile`.
 
-1. applies database migrations,
-2. loads the starter content from `portfolio/data.py`, but only if the database is empty,
-3. creates an admin user, if the three `DJANGO_SUPERUSER_*` variables below are set,
-4. starts gunicorn on port 8000. (Static files are collected when the image is built.)
-
-The code is copied into the image, not mounted, so **after changing any file, run
-`docker compose up --build` again** to see the change.
-
-### Admin user
-
-Either set `DJANGO_SUPERUSER_USER`, `DJANGO_SUPERUSER_EMAIL` and `DJANGO_SUPERUSER_PASSWORD`
-(in a `.env` file next to `docker-compose.yml`) before the first start, or create one by
-hand while the stack is running:
+On start, the dev container applies migrations, loads the starter content from
+`portfolio/data.py` (only into an empty database) and creates an admin user if the three
+`DJANGO_SUPERUSER_*` variables are set. To create one by hand instead:
 
 ```bash
-docker compose exec web python manage.py createsuperuser
+docker compose exec app python manage.py createsuperuser
 ```
 
-### Tests
+Other commands:
 
 ```bash
-docker compose build web && docker compose run --rm web python manage.py test
+docker compose run --rm app python manage.py test             # tests (separate test database)
+docker compose run --rm app flake8                            # lint
+docker compose run --rm app python manage.py makemigrations   # written into the repo
 ```
 
-Django creates and deletes a separate test database, so your content is not touched.
+GitHub Actions runs the tests, flake8 and a check of the deploy config on every push and
+pull request to `main` (`.github/workflows/checks.yml`).
 
-### Running without Docker
+## Deploy
 
-Not supported yet: the settings expect PostgreSQL at host `db`, and the Compose database
-doesn't publish its port to your machine. A local virtualenv is still useful for commands
-that don't need the database, such as creating migrations:
+Production runs on one server with Docker Compose: **app** (gunicorn), **db** (Postgres),
+**proxy** (nginx, ports 80 and 443) and **certbot** (Let's Encrypt certificates, run by
+hand). The same layout as `gesis_surf_backend`.
+
+The proxy picks its configuration when it starts: with no certificate for `DOMAIN` yet, it
+only answers Let's Encrypt's challenge and redirects to HTTPS; once a certificate exists, it
+serves the site over HTTPS (with HSTS) and forwards requests to the app.
+
+### First deploy
+
+The domain's DNS must already point at the server, and ports 80 and 443 must be open.
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python manage.py makemigrations   # warns that it can't reach the database; that's fine
+git clone <this repo> && cd mario_portfolio_django_2
+cp .env.sample .env        # then fill in every value, see the comments in the file
+docker compose -f docker-compose.deploy.yml up -d --build
+docker compose -f docker-compose.deploy.yml run --rm certbot /opt/certify-init.sh
+docker compose -f docker-compose.deploy.yml restart proxy    # switches to HTTPS
 ```
+
+The first proxy start generates Diffie-Hellman parameters, which can take a minute.
+
+### Update to a new version
+
+```bash
+git pull
+docker compose -f docker-compose.deploy.yml up -d --build
+```
+
+Migrations run automatically when the app container starts.
+
+### Renew the certificate
+
+Let's Encrypt certificates last 90 days. Run this regularly (for example weekly, from
+cron); it only renews when a certificate is close to expiring:
+
+```bash
+docker compose -f docker-compose.deploy.yml run --rm certbot certbot renew && \
+docker compose -f docker-compose.deploy.yml exec proxy nginx -s reload
+```
+
+### Check the configuration
+
+```bash
+docker compose -f docker-compose.deploy.yml exec app python manage.py check --deploy
+```
+
+Two warnings are expected, because nginx handles both: `security.W004` (HSTS) and
+`security.W008` (redirect to HTTPS).
 
 ## Editing content
 
@@ -78,33 +116,25 @@ editing it later changes nothing on a running site.
 
 ## Configuration
 
-All settings come from environment variables. `docker-compose.yml` passes them through and
-falls back to development defaults; put real values in a `.env` file (it's git-ignored).
+Settings come from environment variables. In development, `docker-compose.yml` sets them
+directly. In production, `docker-compose.deploy.yml` reads `.env` (copy `.env.sample`; it's
+git-ignored) and refuses to start if a required value is missing.
 
-| Variable | Default | Notes |
+| Variable | Set in production | Notes |
 | --- | --- | --- |
-| `DJANGO_DEBUG` | `1` | Set to `0` in production |
-| `DJANGO_SECRET_KEY` | `dev-secret-key-change-me` | With debug off, must be a random value of 50+ characters |
-| `DJANGO_ALLOWED_HOSTS` | `*` | Comma-separated host names. With debug off, must be set and can't be `*` |
-| `DJANGO_CSRF_TRUSTED_ORIGINS` | empty | Comma-separated origins such as `https://example.com`, if admin login fails with a CSRF error |
-| `DJANGO_BEHIND_HTTPS_PROXY` | `0` | `1` only behind a proxy that handles HTTPS and always sets `X-Forwarded-Proto` |
-| `DJANGO_HSTS_SECONDS` | `0` | Turns on HSTS. Only set it once HTTPS is confirmed working; browsers remember it |
-| `DB_NAME`, `DB_USER`, `DB_PASSWORD` | `postgres` | Used by both the app and the database container |
-| `DB_HOST`, `DB_PORT` | `db`, `5432` | |
-| `DJANGO_SUPERUSER_USER`, `_EMAIL`, `_PASSWORD` | empty | All three needed to create the admin user on start |
-| `PORT`, `GUNICORN_WORKERS` | `8000`, `2` | |
+| `DOMAIN` | `.env` | The site's domain. Also sets `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS` |
+| `ACME_DEFAULT_EMAIL` | `.env` | Let's Encrypt expiry notices |
+| `DJANGO_SECRET_KEY` | `.env` | Random, 50+ characters. The app won't start without it when debug is off |
+| `DB_PASSWORD` | `.env` | `DB_NAME` and `DB_USER` default to `portfolio` |
+| `DJANGO_SUPERUSER_USER`, `_EMAIL`, `_PASSWORD` | `.env`, optional | Admin user created on start if all three are set |
+| `DJANGO_DEBUG` | `0` (compose file) | `1` in development |
+| `DJANGO_BEHIND_HTTPS_PROXY` | `1` (compose file) | Trust nginx's `X-Forwarded-Proto` header. Only safe behind a proxy that always sets it |
+| `DJANGO_HSTS_SECONDS` | `0` (compose file) | Django's HSTS; off because nginx already sends the header |
+| `PORT`, `GUNICORN_WORKERS` | defaults `8000`, `2` | |
 
-> [!WARNING]
-> The defaults are for local development only: debug mode is on, the secret key is public
-> and any host name is accepted. With `DJANGO_DEBUG=0` the app refuses to start until
-> `DJANGO_SECRET_KEY` and `DJANGO_ALLOWED_HOSTS` have real values, and session and CSRF
-> cookies are sent over HTTPS only.
-
-To check a production configuration:
-
-```bash
-docker compose run --rm web python manage.py check --deploy
-```
+With `DJANGO_DEBUG=0`, settings refuse to load unless `DJANGO_SECRET_KEY` and
+`DJANGO_ALLOWED_HOSTS` have real values, and session and CSRF cookies are sent over HTTPS
+only.
 
 ## Where things live
 
@@ -117,7 +147,9 @@ docker compose run --rm web python manage.py check --deploy
 - `portfolio/data.py` + `portfolio/management/commands/load_initial_data.py`: starter content
 - `portfolio/management/commands/ensure_superuser.py`: creates the admin user on start
 - `portfolio/tests.py`: tests
-- `scripts/run.sh`: what the container runs on start
+- `scripts/run.sh`: what the production app container runs on start
+- `docker/proxy/`: nginx image and its HTTP / HTTPS config templates
+- `docker/certbot/`: certbot image and the first-certificate script
 
 ## Working with AI agents
 

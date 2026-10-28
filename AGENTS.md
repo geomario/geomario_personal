@@ -3,8 +3,10 @@
 ## Project
 
 Mario's one-page portfolio site. Django 5 (one app, `portfolio`), server-rendered
-templates, plain JavaScript (no framework, no build step), PostgreSQL 16, served by
-gunicorn + whitenoise, run with Docker Compose. Python 3.13.
+templates, plain JavaScript (no framework, no build step), PostgreSQL 16, Python 3.13.
+Development: `docker-compose.yml` (code mounted, `runserver`). Production:
+`docker-compose.deploy.yml` (gunicorn + whitenoise behind nginx with Let's Encrypt,
+settings from `.env`), the same layout as the `gesis_surf_backend` repo.
 
 Content (focus areas, projects, posts, timeline) lives in the database and is edited in
 `/admin`. `portfolio/data.py` is starter content only: `load_initial_data` copies it into
@@ -12,16 +14,14 @@ an **empty** database on container start, so editing it does not change a runnin
 
 ## Commands
 
-- Run: `docker compose up --build`, then <http://localhost:8000/> and `/admin/`.
-- Code is copied into the image, not mounted: rebuild (`--build`) after every change before
-  checking it in the browser.
-- Django commands against the running stack: `docker compose exec web python manage.py <cmd>`
-- Migrations: create them in a local venv (`python manage.py makemigrations`; the warning
-  about not reaching the database is expected) so the files land in the repo. Creating
-  them inside the container loses them.
+- Run: `docker compose up --build`, then <http://localhost:8000/> and `/admin/`. Code is
+  mounted and reloads; rebuild only after changing `requirements*.txt` or the `Dockerfile`.
+- Django commands: `docker compose run --rm app python manage.py <cmd>` (or `exec app` on
+  the running stack). `makemigrations` run this way writes into the repo.
+- Tests: `docker compose run --rm app python manage.py test` (separate test database).
+  Lint: `docker compose run --rm app flake8`. CI runs both (`.github/workflows/checks.yml`).
 - `python manage.py runserver` outside Docker does not work (no reachable database).
-- Tests: `docker compose build web && docker compose run --rm web python manage.py test`
-  (uses a separate test database). Tests live in `portfolio/tests.py`. No linter yet.
+- Deploy steps are in the README; never run deploy commands against a server unless asked.
 
 ## Where things live
 
@@ -32,8 +32,11 @@ an **empty** database on container start, so editing it does not change a runnin
 - Styles: `portfolio/static/portfolio/css/style.css` (dark theme only; the light theme
   rules exist but nothing turns them on)
 - Interactivity: `portfolio/static/portfolio/js/app.js` (tabs and focus-area filter)
-- Container start-up: `scripts/run.sh` (migrate, seed, `ensure_superuser`, gunicorn).
-  Static files are collected at image build time (`Dockerfile`).
+- Production start-up: `scripts/run.sh` (migrate, seed, `ensure_superuser`, gunicorn).
+  Static files are collected at image build time into `/vol/static` (`Dockerfile`) and
+  served by whitenoise.
+- Proxy / certificates: `docker/proxy/` (nginx templates for HTTP-only and HTTPS) and
+  `docker/certbot/`.
 
 ## Rules
 
