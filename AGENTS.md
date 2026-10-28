@@ -20,7 +20,8 @@ an **empty** database on container start, so editing it does not change a runnin
   about not reaching the database is expected) so the files land in the repo. Creating
   them inside the container loses them.
 - `python manage.py runserver` outside Docker does not work (no reachable database).
-- There are no tests and no linter configured yet.
+- Tests: `docker compose build web && docker compose run --rm web python manage.py test`
+  (uses a separate test database). Tests live in `portfolio/tests.py`. No linter yet.
 
 ## Where things live
 
@@ -31,8 +32,8 @@ an **empty** database on container start, so editing it does not change a runnin
 - Styles: `portfolio/static/portfolio/css/style.css` (dark theme only; the light theme
   rules exist but nothing turns them on)
 - Interactivity: `portfolio/static/portfolio/js/app.js` (tabs and focus-area filter)
-- Container start-up: `scripts/run.sh` (migrate, seed, optional superuser, collectstatic,
-  gunicorn)
+- Container start-up: `scripts/run.sh` (migrate, seed, `ensure_superuser`, gunicorn).
+  Static files are collected at image build time (`Dockerfile`).
 
 ## Rules
 
@@ -40,7 +41,8 @@ an **empty** database on container start, so editing it does not change a runnin
 - Model changes need a migration, committed with the change.
 - Check UI changes in the running site, not only by reading the code.
 - The settings defaults (`DEBUG=1`, a public secret key, `ALLOWED_HOSTS=*`) are for local
-  development; don't treat the current setup as production-ready.
+  development only; with `DJANGO_DEBUG=0` settings refuse to load without real values.
+  Don't weaken that check.
 - Ask before deleting files, changing Docker/deploy setup, pushing to `main`, or running
   `docker compose down -v` (it deletes the database).
 - Keep `README.md` and this file accurate when you change how things work.

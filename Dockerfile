@@ -10,14 +10,12 @@ ENV PYTHONUNBUFFERED=1 \
 COPY ./requirements.txt /requirements.txt
 
 ARG DEV=0
+# psycopg[binary] ships prebuilt wheels, so no compiler or libpq headers are needed.
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     apk add --update --no-cache postgresql-client && \
-    apk add --update --no-cache --virtual .tmp-build-deps \
-    build-base postgresql-dev musl-dev && \
     /py/bin/pip install -r /requirements.txt && \
-    if [ "$DEV" = "1" ]; then /py/bin/pip install flake8; fi && \
-    apk del .tmp-build-deps
+    if [ "$DEV" = "1" ]; then /py/bin/pip install flake8; fi
 
 # Create unprivileged user
 RUN adduser \
@@ -31,7 +29,10 @@ COPY ./mario_portfolio /app/mario_portfolio/
 COPY ./portfolio /app/portfolio/
 COPY ./scripts /scripts/
 
-RUN chmod +x /scripts/run.sh && \
+# Static files only change with the code, so collect them once at build time
+# instead of on every container start.
+RUN /py/bin/python /app/manage.py collectstatic --noinput && \
+    chmod +x /scripts/run.sh && \
     chmod -R 755 /scripts /app && \
     chown -R mario-user:mario-user /app
 

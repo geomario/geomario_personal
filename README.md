@@ -21,7 +21,7 @@ On every start, the container:
 1. applies database migrations,
 2. loads the starter content from `portfolio/data.py`, but only if the database is empty,
 3. creates an admin user, if the three `DJANGO_SUPERUSER_*` variables below are set,
-4. collects static files and starts gunicorn on port 8000.
+4. starts gunicorn on port 8000. (Static files are collected when the image is built.)
 
 The code is copied into the image, not mounted, so **after changing any file, run
 `docker compose up --build` again** to see the change.
@@ -35,6 +35,14 @@ hand while the stack is running:
 ```bash
 docker compose exec web python manage.py createsuperuser
 ```
+
+### Tests
+
+```bash
+docker compose build web && docker compose run --rm web python manage.py test
+```
+
+Django creates and deletes a separate test database, so your content is not touched.
 
 ### Running without Docker
 
@@ -76,16 +84,27 @@ falls back to development defaults; put real values in a `.env` file (it's git-i
 | Variable | Default | Notes |
 | --- | --- | --- |
 | `DJANGO_DEBUG` | `1` | Set to `0` in production |
-| `DJANGO_SECRET_KEY` | `dev-secret-key-change-me` | Must be a long random value in production |
-| `DJANGO_ALLOWED_HOSTS` | `*` | Comma-separated host names |
+| `DJANGO_SECRET_KEY` | `dev-secret-key-change-me` | With debug off, must be a random value of 50+ characters |
+| `DJANGO_ALLOWED_HOSTS` | `*` | Comma-separated host names. With debug off, must be set and can't be `*` |
+| `DJANGO_CSRF_TRUSTED_ORIGINS` | empty | Comma-separated origins such as `https://example.com`, if admin login fails with a CSRF error |
+| `DJANGO_BEHIND_HTTPS_PROXY` | `0` | `1` only behind a proxy that handles HTTPS and always sets `X-Forwarded-Proto` |
+| `DJANGO_HSTS_SECONDS` | `0` | Turns on HSTS. Only set it once HTTPS is confirmed working; browsers remember it |
 | `DB_NAME`, `DB_USER`, `DB_PASSWORD` | `postgres` | Used by both the app and the database container |
 | `DB_HOST`, `DB_PORT` | `db`, `5432` | |
 | `DJANGO_SUPERUSER_USER`, `_EMAIL`, `_PASSWORD` | empty | All three needed to create the admin user on start |
 | `PORT`, `GUNICORN_WORKERS` | `8000`, `2` | |
 
 > [!WARNING]
-> The defaults are for local development only and are not safe to deploy: debug mode is on,
-> the secret key is public and any host name is accepted.
+> The defaults are for local development only: debug mode is on, the secret key is public
+> and any host name is accepted. With `DJANGO_DEBUG=0` the app refuses to start until
+> `DJANGO_SECRET_KEY` and `DJANGO_ALLOWED_HOSTS` have real values, and session and CSRF
+> cookies are sent over HTTPS only.
+
+To check a production configuration:
+
+```bash
+docker compose run --rm web python manage.py check --deploy
+```
 
 ## Where things live
 
@@ -96,6 +115,8 @@ falls back to development defaults; put real values in a `.env` file (it's git-i
 - `portfolio/static/portfolio/css/style.css`: all styles (dark theme)
 - `portfolio/static/portfolio/js/app.js`: Projects/Writing tabs and focus-area filter
 - `portfolio/data.py` + `portfolio/management/commands/load_initial_data.py`: starter content
+- `portfolio/management/commands/ensure_superuser.py`: creates the admin user on start
+- `portfolio/tests.py`: tests
 - `scripts/run.sh`: what the container runs on start
 
 ## Working with AI agents

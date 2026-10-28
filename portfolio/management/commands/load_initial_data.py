@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand
+from django.db import transaction
 
 from portfolio import data
 from portfolio.models import FocusArea, Post, Project, TimelineEntry
@@ -10,8 +11,11 @@ class Command(BaseCommand):
         "Only runs when the database is empty so it is safe to repeat."
     )
 
+    @transaction.atomic
     def handle(self, *args, **options):
-        if FocusArea.objects.exists():
+        # Any content at all counts as "already loaded", so deleting one kind of
+        # content in the admin doesn't make the next start re-add everything.
+        if any(m.objects.exists() for m in (FocusArea, TimelineEntry, Project, Post)):
             self.stdout.write("Data already present — skipping load_initial_data.")
             return
 
