@@ -14,10 +14,13 @@ done
 
 echo "Getting certificate..."
 
+# One certificate for both names; certbot stores it under the first one
+# (/etc/letsencrypt/live/$DOMAIN), which is where nginx looks.
 certbot certonly \
     --webroot \
     --webroot-path "/vol/www/" \
     -d "$DOMAIN" \
+    -d "www.$DOMAIN" \
     --email "$EMAIL" \
     --agree-tos \
     --noninteractive

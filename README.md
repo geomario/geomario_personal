@@ -50,15 +50,56 @@ hand). The same layout as `gesis_surf_backend`.
 
 The proxy picks its configuration when it starts: with no certificate for `DOMAIN` yet, it
 only answers Let's Encrypt's challenge and redirects to HTTPS; once a certificate exists, it
-serves the site over HTTPS (with HSTS) and forwards requests to the app.
+serves the site over HTTPS (with HSTS) and forwards requests to the app. `www.DOMAIN` is
+covered by the same certificate and always redirects to `https://DOMAIN`.
 
-### First deploy
+### 1. Server (Hetzner Cloud)
 
-The domain's DNS must already point at the server, and ports 80 and 443 must be open.
+In the [Hetzner Console](https://console.hetzner.com/), create a server:
+
+- Type **CX23** (2 vCPU, 4 GB RAM), location Nuremberg or Falkenstein, image **Ubuntu 24.04**.
+- Add your SSH public key, so you log in with the key instead of a password.
+- Turn on **Backups** (the content lives in Postgres on this server).
+- Create a **Firewall** and attach it to the server: inbound TCP 22 from your own IP only,
+  TCP 80 and 443 from anywhere. Use Hetzner's firewall rather than `ufw` on the server:
+  ports published by Docker bypass `ufw`.
+
+Then log in and install Docker:
+
+```bash
+ssh root@<server-ip>
+apt update && apt upgrade -y
+```
+
+Install Docker Engine and the Compose plugin by following
+[Docker's Ubuntu guide](https://docs.docker.com/engine/install/ubuntu/), then check that
+`docker compose version` works.
+
+### 2. DNS (GoDaddy)
+
+The domain's nameservers must be GoDaddy's, or records added at GoDaddy are ignored. Check
+with `dig +short NS <domain>`. If they point elsewhere (for example an old DigitalOcean
+setup), in GoDaddy go to the domain's **DNS → Nameservers → Change** and pick GoDaddy's
+default nameservers. That change can take up to 48 hours to spread.
+
+Then, in **DNS → DNS Records**:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| A | `@` | the server's IPv4 address (replace GoDaddy's "Parked" value) |
+| CNAME | `www` | `@` (GoDaddy usually creates this one already) |
+
+Only these are needed; skip AAAA (IPv6) records for now. Wait until both
+`dig +short <domain>` and `dig +short www.<domain>` print the server's IP before the next
+step: Let's Encrypt limits repeated failed attempts.
+
+### 3. First deploy
+
+On the server:
 
 ```bash
 git clone <this repo> && cd mario_portfolio_django_2
-cp .env.sample .env        # then fill in every value, see the comments in the file
+cp .env.sample .env        # fill in every value; DOMAIN is the bare domain, e.g. geomario.com
 docker compose -f docker-compose.deploy.yml up -d --build
 docker compose -f docker-compose.deploy.yml run --rm certbot /opt/certify-init.sh
 docker compose -f docker-compose.deploy.yml restart proxy    # switches to HTTPS

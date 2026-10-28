@@ -35,8 +35,9 @@ an **empty** database on container start, so editing it does not change a runnin
 - Production start-up: `scripts/run.sh` (migrate, seed, `ensure_superuser`, gunicorn).
   Static files are collected at image build time into `/vol/static` (`Dockerfile`) and
   served by whitenoise.
-- Proxy / certificates: `docker/proxy/` (nginx templates for HTTP-only and HTTPS) and
-  `docker/certbot/`.
+- Proxy / certificates: `docker/proxy/` (nginx templates for HTTP-only and HTTPS;
+  `www.DOMAIN` redirects to `DOMAIN`) and `docker/certbot/` (one certificate for both).
+- Hosting: Hetzner Cloud server, domain `geomario.com` with DNS at GoDaddy (README "Deploy").
 
 ## Rules
 
