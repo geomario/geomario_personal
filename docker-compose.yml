@@ -45,5 +45,21 @@ services:
       timeout: 5s
       retries: 5
 
+  # Terraform for the Hetzner server, without installing it (see README "Deploy"):
+  #   docker compose run --rm terraform plan
+  # Needs HCLOUD_TOKEN in your environment. Not started by `docker compose up`.
+  terraform:
+    image: hashicorp/terraform:1.15.4
+    profiles: [tools]
+    working_dir: /app/infra
+    entrypoint: ["sh", "/app/docker/terraform.sh"]
+    volumes:
+      - .:/app
+      - terraform_data:/terraform-data
+      - ${HOME}/.ssh/id_ed25519.pub:/ssh/id.pub:ro
+    environment:
+      - HCLOUD_TOKEN
+
 volumes:
   postgres_data:
+  terraform_data:

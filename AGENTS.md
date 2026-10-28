@@ -21,7 +21,10 @@ an **empty** database on container start, so editing it does not change a runnin
 - Tests: `docker compose run --rm app python manage.py test` (separate test database).
   Lint: `docker compose run --rm app flake8`. CI runs both (`.github/workflows/checks.yml`).
 - `python manage.py runserver` outside Docker does not work (no reachable database).
-- Deploy steps are in the README; never run deploy commands against a server unless asked.
+- Terraform (Hetzner server): `docker compose run --rm terraform <plan|validate|fmt>`;
+  needs `HCLOUD_TOKEN` in the environment.
+- Deploy steps are in the README; never run deploy commands against a server, or
+  `terraform apply`/`destroy`, unless asked.
 
 ## Where things live
 
@@ -37,7 +40,9 @@ an **empty** database on container start, so editing it does not change a runnin
   served by whitenoise.
 - Proxy / certificates: `docker/proxy/` (nginx templates for HTTP-only and HTTPS;
   `www.DOMAIN` redirects to `DOMAIN`) and `docker/certbot/` (one certificate for both).
-- Hosting: Hetzner Cloud server, domain `geomario.com` with DNS at GoDaddy (README "Deploy").
+- Hosting: Hetzner Cloud server created by Terraform in `infra/` (local, git-ignored
+  state; first-boot setup in `infra/cloud-init.yaml`), domain `geomario.com` with DNS at
+  GoDaddy (README "Deploy").
 
 ## Rules
 

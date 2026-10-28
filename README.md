@@ -53,27 +53,47 @@ only answers Let's Encrypt's challenge and redirects to HTTPS; once a certificat
 serves the site over HTTPS (with HSTS) and forwards requests to the app. `www.DOMAIN` is
 covered by the same certificate and always redirects to `https://DOMAIN`.
 
-### 1. Server (Hetzner Cloud)
+### 1. Server (Hetzner Cloud, with Terraform)
 
-In the [Hetzner Console](https://console.hetzner.com/), create a server:
+Terraform in [`infra/`](infra/) creates the server, its firewall and your SSH key in
+Hetzner Cloud. It runs in Docker, so there's nothing to install:
 
-- Type **CX23** (2 vCPU, 4 GB RAM), location Nuremberg or Falkenstein, image **Ubuntu 24.04**.
-- Add your SSH public key, so you log in with the key instead of a password.
-- Turn on **Backups** (the content lives in Postgres on this server).
-- Create a **Firewall** and attach it to the server: inbound TCP 22 from your own IP only,
-  TCP 80 and 443 from anywhere. Use Hetzner's firewall rather than `ufw` on the server:
-  ports published by Docker bypass `ufw`.
+| Resource | Details |
+| --- | --- |
+| Server | `cpx02` (1 vCPU, 1 GB RAM, 20 GB), Nuremberg, Ubuntu 24.04, backups on. Terraform refuses to delete it (`prevent_destroy`) |
+| Firewall | Inbound 22 (SSH), 80, 443 and ping. Hetzner's firewall, because ports published by Docker bypass `ufw` on the server |
+| SSH key | Your `~/.ssh/id_ed25519.pub`. Password logins are turned off |
+| First boot | [`infra/cloud-init.yaml`](infra/cloud-init.yaml): Docker Engine + Compose, a 2 GB swap file, and a `deploy` user for GitHub Actions |
 
-Then log in and install Docker:
+SSH is open to all addresses because GitHub Actions will deploy over it; only key logins
+work. To limit it to your own IP for now, set `ssh_source_ips` in `infra/variables.tf`.
+
+**API token.** In the Hetzner Console, open the project, go to **Security → API tokens**,
+generate a **Read & Write** token and store it in the macOS Keychain (it asks for the
+token, so it never lands in your shell history):
 
 ```bash
-ssh root@<server-ip>
-apt update && apt upgrade -y
+security add-generic-password -a "$USER" -s hcloud-token -w
 ```
 
-Install Docker Engine and the Compose plugin by following
-[Docker's Ubuntu guide](https://docs.docker.com/engine/install/ubuntu/), then check that
-`docker compose version` works.
+**Create the server.** In each terminal you use for Terraform:
+
+```bash
+export HCLOUD_TOKEN=$(security find-generic-password -a "$USER" -s hcloud-token -w)
+docker compose run --rm terraform plan     # shows what will be created; read it
+docker compose run --rm terraform apply    # creates it after you type "yes"
+docker compose run --rm terraform output   # the server's IP and the ssh command
+```
+
+Terraform's state (its record of what it created) is `infra/terraform.tfstate`, kept on
+your machine and out of git. Don't delete it: without it, Terraform no longer knows the
+server exists.
+
+Wait a few minutes for the first-boot setup, then check it finished:
+
+```bash
+ssh root@<server-ip> cloud-init status --wait     # should end with "status: done"
+ssh root@<server-ip> docker compose version
 
 ### 2. DNS (GoDaddy)
 
@@ -191,6 +211,7 @@ only.
 - `scripts/run.sh`: what the production app container runs on start
 - `docker/proxy/`: nginx image and its HTTP / HTTPS config templates
 - `docker/certbot/`: certbot image and the first-certificate script
+- `infra/`: Terraform for the Hetzner server (run through `docker/terraform.sh`)
 
 ## Working with AI agents
 

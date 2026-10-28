@@ -25,3 +25,7 @@ staticfiles/
 .env
 .env.*
 !.env.sample
+# Terraform (state stays local, see infra/terraform.tf)
+*.tfstate
+*.tfstate.*
+.terraform/
