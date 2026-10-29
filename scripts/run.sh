@@ -12,8 +12,8 @@ python manage.py ensure_superuser
 
 echo "Starting gunicorn..."
 exec gunicorn mario_portfolio.wsgi:application \
-    --bind 0.0.0.0:${PORT:-8000} \
-    --workers ${GUNICORN_WORKERS:-2} \
+    --bind "0.0.0.0:${PORT:-8000}" \
+    --workers "${GUNICORN_WORKERS:-2}" \
     --no-control-socket \
     --access-logfile - \
     --error-logfile -

@@ -19,7 +19,9 @@ an **empty** database on container start, so editing it does not change a runnin
 - Django commands: `docker compose run --rm app python manage.py <cmd>` (or `exec app` on
   the running stack). `makemigrations` run this way writes into the repo.
 - Tests: `docker compose run --rm app python manage.py test` (separate test database).
-  Lint: `docker compose run --rm app flake8`. CI runs both (`.github/workflows/checks.yml`).
+  Lint: `docker compose run --rm app flake8`. CI runs both (`.github/workflows/checks.yml`)
+  and, on pushes to `main`, builds the image to `ghcr.io` and deploys it over SSH with
+  `scripts/deploy.sh`. A push to `main` is a production deploy.
 - `python manage.py runserver` outside Docker does not work (no reachable database).
 - Terraform (Hetzner server): `docker compose run --rm terraform <plan|validate|fmt>`;
   needs `HCLOUD_TOKEN` in the environment.

@@ -137,14 +137,36 @@ Don't `cat .env` or paste it anywhere: the database password and the Django secr
 must stay on the server. The first proxy start generates Diffie-Hellman parameters, which
 can take a minute.
 
-### Update to a new version
+### Deploying changes (automatic)
 
-```bash
-git pull
-docker compose -f docker-compose.deploy.yml up -d --build
-```
+Every push to `main` that passes the checks is deployed by GitHub Actions
+(`.github/workflows/checks.yml`):
 
-Migrations run automatically when the app container starts.
+1. It builds the app image and pushes it to `ghcr.io/geomario/geomario_personal`, tagged
+   with the commit SHA and `latest`. Building happens on GitHub, not on the small server.
+2. It connects to the server as `deploy` with its own SSH key. That key is restricted to
+   one command, [`scripts/deploy.sh`](scripts/deploy.sh), which receives the commit SHA.
+3. `deploy.sh` checks out that commit, records it as `APP_TAG` in `.env`, pulls the image,
+   rebuilds the small proxy and certbot images, restarts the stack and checks that the site
+   answers. Migrations run when the app container starts.
+
+To deploy a commit by hand instead, on the server as `deploy`:
+`scripts/deploy.sh <full-commit-sha>`.
+
+**One-time setup** (already done for geomario.com):
+
+- A dedicated key pair for CI. Its public key goes in `/home/deploy/.ssh/authorized_keys`,
+  restricted to the deploy script:
+  `restrict,command="/home/deploy/geomario_personal/scripts/deploy.sh" ssh-ed25519 AAAA… github-actions-deploy`
+- In the GitHub repository, **Settings → Secrets and variables → Actions**:
+  - secret `DEPLOY_SSH_KEY`: the CI private key,
+  - variable `DEPLOY_HOST`: the server's IP address,
+  - variable `DEPLOY_KNOWN_HOSTS`: the server's host key, from
+    `ssh-keyscan -t ed25519 <server-ip>`.
+
+  The deploy job is skipped while `DEPLOY_HOST` is empty.
+- The `ghcr.io` package must be **public**, so the server can pull it without logging in:
+  on GitHub, **Packages → geomario_personal → Package settings → Change visibility**.
 
 ### Renew the certificate
 
@@ -234,6 +256,7 @@ only.
 - `portfolio/management/commands/ensure_superuser.py`: creates the admin user on start
 - `portfolio/tests.py`: tests
 - `scripts/run.sh`: what the production app container runs on start
+- `scripts/deploy.sh`: deploys one commit on the server (run by GitHub Actions)
 - `docker/proxy/`: nginx image and its HTTP / HTTPS config templates
 - `docker/certbot/`: certbot image and the first-certificate script
 - `infra/`: Terraform for the Hetzner server (run through `docker/terraform.sh`)

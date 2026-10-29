@@ -1,5 +1,8 @@
 services:
   app:
+    # Built and pushed by GitHub Actions; scripts/deploy.sh sets APP_TAG (in .env)
+    # to the deployed commit. `up --build` still builds it locally under this name.
+    image: ghcr.io/geomario/geomario_personal:${APP_TAG:-latest}
     build:
       context: .
     restart: always
