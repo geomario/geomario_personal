@@ -51,8 +51,10 @@ TIMELINE = [
         "Behavioral analytics",
         "Doctoral Researcher, IT & Business Analytics",
         "University of Cologne",
-        "How people go from first click to purchase: modelling browsing and buying behaviour "
-        "to uncover shopper segments and the decision points that drive conversion.",
+        "Shoppers don't stay in one segment. Using GESIS Surf data, I model how people move "
+        "between behaviours across retailers, with dynamic clusters and Markov chains, and "
+        "measure the instability of those moves with Fisher information, to tell seasonal "
+        "effects from real shifts in behaviour.",
     ),
 ]
 
