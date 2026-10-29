@@ -42,7 +42,9 @@ an **empty** database on container start, so editing it does not change a runnin
   `www.DOMAIN` redirects to `DOMAIN`) and `docker/certbot/` (one certificate for both).
 - Hosting: Hetzner Cloud server created by Terraform in `infra/` (local, git-ignored
   state; first-boot setup in `infra/cloud-init.yaml`), domain `geomario.com` with DNS at
-  GoDaddy (README "Deploy").
+  GoDaddy (README "Deploy"). On the server the app runs from
+  `/home/deploy/geomario_personal` as the `deploy` user (no sudo), whose crontab renews
+  the certificate daily.
 
 ## Rules
 

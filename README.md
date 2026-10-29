@@ -115,17 +115,27 @@ step: Let's Encrypt limits repeated failed attempts.
 
 ### 3. First deploy
 
-On the server:
+On the server, logged in as **`deploy`** (`ssh deploy@<server-ip>`). The checkout and `.env`
+must belong to this user, because GitHub Actions deploys as `deploy`. It has no `sudo` on
+purpose; use `root` for system administration.
 
 ```bash
-git clone <this repo> && cd mario_portfolio_django_2
-cp .env.sample .env        # fill in every value; DOMAIN is the bare domain, e.g. geomario.com
+git clone https://github.com/geomario/geomario_personal.git && cd geomario_personal
+
+# .env with secrets generated on the server, never printed; readable only by deploy
+cp .env.sample .env && chmod 600 .env
+sed -i "s|^DB_PASSWORD=.*|DB_PASSWORD=$(openssl rand -hex 24)|; s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$(openssl rand -base64 48 | tr -d '\n/+=')|; s|^DOMAIN=.*|DOMAIN=geomario.com|; s|^ACME_DEFAULT_EMAIL=.*|ACME_DEFAULT_EMAIL=<your email>|" .env
+grep -E '^(DB_PASSWORD|DJANGO_SECRET_KEY|DOMAIN)=' .env | sed 's/=.\{6\}.*/=<set>/'   # check without showing values
+
 docker compose -f docker-compose.deploy.yml up -d --build
 docker compose -f docker-compose.deploy.yml run --rm certbot /opt/certify-init.sh
 docker compose -f docker-compose.deploy.yml restart proxy    # switches to HTTPS
+docker compose -f docker-compose.deploy.yml exec app python manage.py createsuperuser
 ```
 
-The first proxy start generates Diffie-Hellman parameters, which can take a minute.
+Don't `cat .env` or paste it anywhere: the database password and the Django secret key
+must stay on the server. The first proxy start generates Diffie-Hellman parameters, which
+can take a minute.
 
 ### Update to a new version
 
@@ -138,12 +148,27 @@ Migrations run automatically when the app container starts.
 
 ### Renew the certificate
 
-Let's Encrypt certificates last 90 days. Run this regularly (for example weekly, from
-cron); it only renews when a certificate is close to expiring:
+Let's Encrypt certificates last 90 days. A daily cron job for the `deploy` user runs
+`certbot renew`, which only renews when the certificate has less than 30 days left, then
+reloads nginx so it picks up the new files. Install it once, as `deploy`:
 
 ```bash
-docker compose -f docker-compose.deploy.yml run --rm certbot certbot renew && \
-docker compose -f docker-compose.deploy.yml exec proxy nginx -s reload
+(crontab -l 2>/dev/null | grep -v 'certbot renew'; echo '17 3 * * * cd $HOME/geomario_personal && { docker compose -f docker-compose.deploy.yml run --rm certbot certbot renew --quiet && docker compose -f docker-compose.deploy.yml exec -T proxy nginx -s reload; } >> $HOME/cert-renew.log 2>&1') | crontab -
+crontab -l    # check it's there
+```
+
+Certbot waits a random few minutes before renewing when it runs unattended, so a
+manual run can look stuck. To test the whole renewal against Let's Encrypt's staging
+server without touching the real certificate:
+
+```bash
+docker compose -f docker-compose.deploy.yml run --rm certbot certbot renew --dry-run --no-random-sleep-on-renew
+```
+
+Check the certificate's expiry date from anywhere with:
+
+```bash
+echo | openssl s_client -connect geomario.com:443 -servername geomario.com 2>/dev/null | openssl x509 -noout -enddate
 ```
 
 ### Check the configuration
