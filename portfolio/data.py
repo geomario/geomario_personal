@@ -14,17 +14,37 @@ FOCUS_AREAS = [
     "Leadership",
 ]
 
-# Career since 2017, oldest first. "when" is the field, not a date: the page
-# deliberately shows no years, durations or locations.
+# Career since 2017, current role first. "when" is the field, not a date: the
+# page deliberately shows no years, durations or locations.
 TIMELINE = [
     {
-        "when": "Energy research",
-        "title": "Research Associate, Applied Geophysics & Geothermal Energy",
-        "org": "E.ON Energy Research Center",
+        "when": "Research",
+        "title": "Senior Research Software Engineer",
+        "org": "GESIS – Leibniz Institute for the Social Sciences",
         "body": (
-            "Monitored geothermal wells with fibre-optic temperature sensing, built the "
-            "PostgreSQL databases behind it, and turned the data into predictive models and "
-            "numerical reservoir simulations."
+            "I build and design the software and algorithms that collect and model digital "
+            "behavioural data from web and mobile, supporting computational social scientists "
+            "from study design to publication, with open science as the default."
+        ),
+    },
+    {
+        "when": "Behavioral analytics",
+        "title": "Doctoral Researcher, Behavioral Analytics",
+        "org": "University of Cologne",
+        "body": (
+            "Shoppers don't stay in one segment. Using GESIS Surf data, I model how people move "
+            "between behaviours across retailers, with dynamic clusters and Markov chains, and "
+            "measure the instability of those moves with Fisher information, to tell seasonal "
+            "effects from real shifts in behaviour."
+        ),
+    },
+    {
+        "when": "Open finance",
+        "title": "Senior Full Stack & Data Developer",
+        "org": "Finerio Connect",
+        "body": (
+            "Reverse-engineered, built and secured data connections to banks' APIs with Python "
+            "on AWS Lambda, keeping open-finance data accurate, current and protected."
         ),
     },
     {
@@ -33,37 +53,17 @@ TIMELINE = [
         "org": "GeoLegalTech GmbH",
         "body": (
             "Joined as a senior full-stack and data science developer, then led the "
-            "company's software development and data science."
+            "company's software development and data science endeavours in legal tech."
         ),
     },
     {
-        "when": "Open finance",
-        "title": "Senior Full Stack & Data Developer",
-        "org": "Finerio Connect",
+        "when": "Energy research",
+        "title": "Research Associate, Applied Geophysics & Geothermal Energy",
+        "org": "E.ON Energy Research Center",
         "body": (
-            "Built and secured data connections to banks' APIs with Python on AWS Lambda, "
-            "keeping open-finance data accurate, current and protected."
-        ),
-    },
-    {
-        "when": "Research",
-        "title": "Senior Research Software Engineer",
-        "org": "GESIS – Leibniz Institute for the Social Sciences",
-        "body": (
-            "Building the software and algorithms that collect and model digital behavioural "
-            "data from web and mobile, and supporting researchers from study design to "
-            "publication, with open science as the default."
-        ),
-    },
-    {
-        "when": "Behavioral analytics",
-        "title": "Doctoral Researcher, IT & Business Analytics",
-        "org": "University of Cologne",
-        "body": (
-            "Shoppers don't stay in one segment. Using GESIS Surf data, I model how people move "
-            "between behaviours across retailers, with dynamic clusters and Markov chains, and "
-            "measure the instability of those moves with Fisher information, to tell seasonal "
-            "effects from real shifts in behaviour."
+            "Monitored geothermal wells with fibre-optic temperature sensing, built the "
+            "PostgreSQL databases behind it, and turned the data into predictive models and "
+            "numerical reservoir simulations."
         ),
     },
 ]

@@ -16,7 +16,39 @@ PLACEHOLDER_TITLES = [
     "Software Research Engineer & PhD Candidate",
 ]
 
+# Current role first.
 TIMELINE = [
+    (
+        "Research",
+        "Senior Research Software Engineer",
+        "GESIS – Leibniz Institute for the Social Sciences",
+        "I build and design the software and algorithms that collect and model digital "
+        "behavioural data from web and mobile, supporting computational social scientists "
+        "from study design to publication, with open science as the default.",
+    ),
+    (
+        "Behavioral analytics",
+        "Doctoral Researcher, Behavioral Analytics",
+        "University of Cologne",
+        "Shoppers don't stay in one segment. Using GESIS Surf data, I model how people move "
+        "between behaviours across retailers, with dynamic clusters and Markov chains, and "
+        "measure the instability of those moves with Fisher information, to tell seasonal "
+        "effects from real shifts in behaviour.",
+    ),
+    (
+        "Open finance",
+        "Senior Full Stack & Data Developer",
+        "Finerio Connect",
+        "Reverse-engineered, built and secured data connections to banks' APIs with Python on "
+        "AWS Lambda, keeping open-finance data accurate, current and protected.",
+    ),
+    (
+        "Legal tech",
+        "Head of Software Development & Data Science",
+        "GeoLegalTech GmbH",
+        "Joined as a senior full-stack and data science developer, then led the company's "
+        "software development and data science endeavours in legal tech.",
+    ),
     (
         "Energy research",
         "Research Associate, Applied Geophysics & Geothermal Energy",
@@ -24,37 +56,6 @@ TIMELINE = [
         "Monitored geothermal wells with fibre-optic temperature sensing, built the PostgreSQL "
         "databases behind it, and turned the data into predictive models and numerical "
         "reservoir simulations.",
-    ),
-    (
-        "Legal tech",
-        "Head of Software Development & Data Science",
-        "GeoLegalTech GmbH",
-        "Joined as a senior full-stack and data science developer, then led the company's "
-        "software development and data science.",
-    ),
-    (
-        "Open finance",
-        "Senior Full Stack & Data Developer",
-        "Finerio Connect",
-        "Built and secured data connections to banks' APIs with Python on AWS Lambda, keeping "
-        "open-finance data accurate, current and protected.",
-    ),
-    (
-        "Research",
-        "Senior Research Software Engineer",
-        "GESIS – Leibniz Institute for the Social Sciences",
-        "Building the software and algorithms that collect and model digital behavioural data "
-        "from web and mobile, and supporting researchers from study design to publication, "
-        "with open science as the default.",
-    ),
-    (
-        "Behavioral analytics",
-        "Doctoral Researcher, IT & Business Analytics",
-        "University of Cologne",
-        "Shoppers don't stay in one segment. Using GESIS Surf data, I model how people move "
-        "between behaviours across retailers, with dynamic clusters and Markov chains, and "
-        "measure the instability of those moves with Fisher information, to tell seasonal "
-        "effects from real shifts in behaviour.",
     ),
 ]
 
