@@ -46,12 +46,6 @@ TIMELINE = [
         ),
     },
     {
-        "when": "Education",
-        "title": "Postgraduate Diploma, Data Science & Artificial Intelligence",
-        "org": "University of London",
-        "body": "Machine learning, data science and artificial intelligence.",
-    },
-    {
         "when": "Research",
         "title": "Senior Research Software Engineer",
         "org": "GESIS – Leibniz Institute for the Social Sciences",
@@ -62,13 +56,12 @@ TIMELINE = [
         ),
     },
     {
-        "when": "Doctorate",
+        "when": "Behavioral analytics",
         "title": "Doctoral Researcher, IT & Business Analytics",
         "org": "University of Cologne",
         "body": (
-            "Web-tracking studies of how consumers move through digital journeys: clickstreams, "
-            "page snapshots and purchases, clustered into shopper segments that show where "
-            "journeys convert."
+            "How people go from first click to purchase: modelling browsing and buying "
+            "behaviour to uncover shopper segments and the decision points that drive conversion."
         ),
     },
 ]

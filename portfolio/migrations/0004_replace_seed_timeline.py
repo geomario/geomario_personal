@@ -40,12 +40,6 @@ TIMELINE = [
         "open-finance data accurate, current and protected.",
     ),
     (
-        "Education",
-        "Postgraduate Diploma, Data Science & Artificial Intelligence",
-        "University of London",
-        "Machine learning, data science and artificial intelligence.",
-    ),
-    (
         "Research",
         "Senior Research Software Engineer",
         "GESIS – Leibniz Institute for the Social Sciences",
@@ -54,12 +48,11 @@ TIMELINE = [
         "with open science as the default.",
     ),
     (
-        "Doctorate",
+        "Behavioral analytics",
         "Doctoral Researcher, IT & Business Analytics",
         "University of Cologne",
-        "Web-tracking studies of how consumers move through digital journeys: clickstreams, "
-        "page snapshots and purchases, clustered into shopper segments that show where "
-        "journeys convert.",
+        "How people go from first click to purchase: modelling browsing and buying behaviour "
+        "to uncover shopper segments and the decision points that drive conversion.",
     ),
 ]
 

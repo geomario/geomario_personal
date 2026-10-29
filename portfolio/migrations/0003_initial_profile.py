@@ -12,7 +12,7 @@ PROFILE = {
         "tech and market research; formerly Head of Software & Data Science, now at GESIS and a "
         "doctoral researcher at the University of Cologne."
     ),
-    "availability": "Available for architecture & research-engineering conversations",
+    "availability": "Data platforms · Machine learning · Systems architecture",
     "location": "Aachen, Germany",
     "organisation": "GESIS – Leibniz Institute for the Social Sciences",
     "email": "marm1984@gmail.com",
