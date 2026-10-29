@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ profile.name }} · {{ profile.role }}</title>
   <meta name="description" content="{{ profile.intro }}">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="preload" href="{% static 'portfolio/fonts/michroma-400.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{% static 'portfolio/css/style.css' %}">
 </head>
 <body>
@@ -14,8 +14,11 @@
 
     <header class="hero">
       <div class="hero-row">
-        <div class="hero-photo">
-          <img src="{% static 'portfolio/img/mario-ramirez.jpg' %}" alt="{{ profile.name }}" width="400" height="400">
+        <div class="hero-target">
+          <div class="hero-photo">
+            <img src="{% static 'portfolio/img/mario-ramirez.jpg' %}" alt="{{ profile.name }}" width="400" height="400">
+          </div>
+          <div class="target-label mono" aria-hidden="true">TGT 01 · LOCKED</div>
         </div>
         <div class="hero-text">
           {% if profile.availability %}<div class="eyebrow">{{ profile.availability }}</div>{% endif %}
@@ -122,9 +125,9 @@
         <a class="panel-link" href="https://www.gesis.org/en/services/planning-studies-and-collecting-data/collecting/gesis-web-tracking" target="_blank" rel="noopener noreferrer" aria-label="GESIS Web Tracking service page" title="GESIS Web Tracking service page">↗</a>
         <div class="panel-title">GESIS Surf – longitudinal web tracking</div>
         <div class="stat-row">
-          <div class="stat"><b>1,070</b><span>tracked users</span></div>
-          <div class="stat"><b>&gt;2 TB</b><span>longitudinal data</span></div>
-          <div class="stat"><b>DE</b><span>German extension</span></div>
+          <div class="stat"><b class="led">1,070</b><span>tracked users</span></div>
+          <div class="stat"><b class="led"><span class="led-sym">&gt;</span>2 TB</b><span>longitudinal data</span></div>
+          <div class="stat"><b class="led">DE</b><span>German extension</span></div>
         </div>
         <div class="stack-row">
           <span class="stack-tag mono">Python</span>
