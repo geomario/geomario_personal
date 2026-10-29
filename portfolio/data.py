@@ -10,6 +10,7 @@ migration 0003 instead.
 FOCUS_AREAS = [
     "Research Software Infrastructure",
     "Research Software",
+    "Modeling & Machine Learning",
     "Data Infrastructure",
     "Behavioral Data",
     "Leadership",
@@ -75,10 +76,10 @@ PROJECTS = [
         "name": "GESIS Surf",
         "tag": "Research Software Infrastructure",
         "desc": (
-            "Open-source infrastructure for collecting web browsing behaviour in social "
-            "science studies: a browser extension feeding a Django REST backend that records "
-            "windows, tabs, domains, clicks, scrolls and page HTML, with Celery for async "
-            "processing, Elasticsearch for search and an ELK stack for monitoring."
+            "The open-source research infrastructure behind the GESIS Surf panel: a browser "
+            "extension sends windows, tabs, domains, clicks, scrolls and page HTML to a Django "
+            "REST backend, where Celery processes it, PostgreSQL stores it and Elasticsearch "
+            "makes it searchable, with ELK monitoring for long-running studies."
         ),
         "stack": ["Django REST", "PostgreSQL", "Celery", "Elasticsearch", "Browser extension"],
         "url": "https://github.com/gesiscss/gesis_surf_backend",
@@ -87,19 +88,34 @@ PROJECTS = [
         "name": "GESIS Surf Mobile",
         "tag": "Research Software",
         "desc": (
-            "Cross-platform React Native app for mobile studies, using VPN-based packet "
-            "inspection on Android and iOS plus the Accessibility API."
+            "Brings GESIS Surf to smartphones: a cross-platform React Native app that captures "
+            "how participants browse and use apps, through VPN-based packet inspection on "
+            "Android and iOS and the Accessibility API, so studies can follow behaviour across "
+            "desktop and mobile."
         ),
-        "stack": ["React Native", "TypeScript", "VPN packet inspection", "Accessibility API"],
+        "stack": ["React Native", "Expo", "TypeScript", "VPN packet inspection", "Accessibility API"],
     },
     {
         "name": "mcp-server-gesis-surf",
         "tag": "Research Software",
         "desc": (
-            "A TypeScript MCP server exposing the panel's PostgreSQL data to LLM "
-            "tooling, built with Spec-Driven Development."
+            "Connects AI agents to the GESIS Surf infrastructure through the Model Context "
+            "Protocol: a TypeScript server that lets LLM tools query the panel's PostgreSQL "
+            "data and make tightly scoped updates (no inserts or deletes, a WHERE clause "
+            "required, protected tables, validated inputs). Built with Spec-Driven Development."
         ),
-        "stack": ["TypeScript", "MCP", "PostgreSQL"],
+        "stack": ["TypeScript", "MCP", "PostgreSQL", "Zod"],
+    },
+    {
+        "name": "Dynamic Shopper Segments",
+        "tag": "Modeling & Machine Learning",
+        "desc": (
+            "Doctoral research on behaviour across many retailers: visits are clustered into "
+            "behavioural states, shoppers are grouped by how they move between those states "
+            "over time with Markov chains, and Fisher information measures how stable the "
+            "groups are, separating seasonal swings from real shifts."
+        ),
+        "stack": ["Python", "Clustering", "Markov chains", "Fisher information"],
     },
     {
         "name": "PreisRe",

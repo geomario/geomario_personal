@@ -119,6 +119,8 @@ class UpdateProjectsTests(TestCase):
         self.assertEqual(projects[0].url, self.migration.GESIS_SURF["url"])
         self.assertEqual(projects[1].tag, research)
         self.assertIn("Accessibility API", projects[1].stack)
+        self.assertEqual(projects[2].desc, self.migration.MCP["desc"])
+        self.assertEqual(projects[3].tag.name, "Modeling & Machine Learning")
 
     def test_does_nothing_without_the_starter_projects(self):
         self.migration.update_projects(django_apps, None)
