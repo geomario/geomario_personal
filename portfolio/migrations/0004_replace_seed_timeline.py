@@ -22,9 +22,10 @@ TIMELINE = [
         "Research",
         "Senior Research Software Engineer",
         "GESIS – Leibniz Institute for the Social Sciences",
-        "I build and design the software and algorithms that collect and model digital "
-        "behavioural data from web and mobile, supporting computational social scientists "
-        "from study design to publication, with open science as the default.",
+        "I build, design and lead the research software and algorithms that collect and "
+        "model digital behavioural data from web and mobile, supporting computational "
+        "social scientists from study design to publication, with open science as the "
+        "default.",
     ),
     (
         "Behavioral analytics",
