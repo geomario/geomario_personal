@@ -8,8 +8,9 @@ migration 0003 instead.
 """
 
 FOCUS_AREAS = [
-    "Data Infrastructure",
+    "Research Software Infrastructure",
     "Research Software",
+    "Data Infrastructure",
     "Behavioral Data",
     "Leadership",
 ]
@@ -71,13 +72,25 @@ TIMELINE = [
 
 PROJECTS = [
     {
-        "name": "GESISSurfMobile",
-        "tag": "Behavioral Data",
+        "name": "GESIS Surf",
+        "tag": "Research Software Infrastructure",
         "desc": (
-            "Cross-platform React Native tracker performing VPN-based packet "
-            "inspection on Android and iOS, feeding the panel's web-journey data."
+            "Open-source infrastructure for collecting web browsing behaviour in social "
+            "science studies: a browser extension feeding a Django REST backend that records "
+            "windows, tabs, domains, clicks, scrolls and page HTML, with Celery for async "
+            "processing, Elasticsearch for search and an ELK stack for monitoring."
         ),
-        "stack": ["React Native", "VPN/packet inspection", "TypeScript"],
+        "stack": ["Django REST", "PostgreSQL", "Celery", "Elasticsearch", "Browser extension"],
+        "url": "https://github.com/gesiscss/gesis_surf_backend",
+    },
+    {
+        "name": "GESIS Surf Mobile",
+        "tag": "Research Software",
+        "desc": (
+            "Cross-platform React Native app for mobile studies, using VPN-based packet "
+            "inspection on Android and iOS plus the Accessibility API."
+        ),
+        "stack": ["React Native", "TypeScript", "VPN packet inspection", "Accessibility API"],
     },
     {
         "name": "mcp-server-gesis-surf",
@@ -96,15 +109,6 @@ PROJECTS = [
             "scraping, normalizing, and serving pricing data at scale."
         ),
         "stack": ["Python", "Scrapy", "Django"],
-    },
-    {
-        "name": "Cross-Retailer Behavioural Clustering",
-        "tag": "Research Software",
-        "desc": (
-            "Academic paper building a verified taxonomy of German online grocery "
-            "and retail categories from panel behavior."
-        ),
-        "stack": ["Verified taxonomy", "WZ 2008", "Academic writing"],
     },
 ]
 

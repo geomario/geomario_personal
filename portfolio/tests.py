@@ -99,6 +99,32 @@ class ReplaceSeedTimelineTests(TestCase):
         self.assertFalse(TimelineEntry.objects.exists())
 
 
+class UpdateProjectsTests(TestCase):
+    migration = importlib.import_module("portfolio.migrations.0005_update_projects")
+
+    def test_updates_the_original_starter_projects(self):
+        behavioral = FocusArea.objects.create(name="Behavioral Data")
+        research = FocusArea.objects.create(name="Research Software")
+        data_infra = FocusArea.objects.create(name="Data Infrastructure")
+        Project.objects.create(name="GESISSurfMobile", tag=behavioral, desc="d", order=0)
+        Project.objects.create(name="mcp-server-gesis-surf", tag=research, desc="d", order=1)
+        Project.objects.create(name="PreisRe", tag=data_infra, desc="d", order=2)
+        Project.objects.create(name=self.migration.REMOVED, tag=research, desc="d", order=3)
+
+        self.migration.update_projects(django_apps, None)
+
+        projects = list(Project.objects.select_related("tag"))
+        self.assertEqual([p.name for p in projects], self.migration.ORDER)
+        self.assertEqual(projects[0].tag.name, "Research Software Infrastructure")
+        self.assertEqual(projects[0].url, self.migration.GESIS_SURF["url"])
+        self.assertEqual(projects[1].tag, research)
+        self.assertIn("Accessibility API", projects[1].stack)
+
+    def test_does_nothing_without_the_starter_projects(self):
+        self.migration.update_projects(django_apps, None)
+        self.assertFalse(Project.objects.exists())
+
+
 class EnsureSuperuserTests(TestCase):
     env = {
         "DJANGO_SUPERUSER_USER": "admin",

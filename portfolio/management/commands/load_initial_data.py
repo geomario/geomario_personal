@@ -39,6 +39,7 @@ class Command(BaseCommand):
                 tag=focus_map.get(p["tag"]),
                 desc=p["desc"],
                 stack=p["stack"],
+                url=p.get("url", ""),
                 order=i,
             )
 
