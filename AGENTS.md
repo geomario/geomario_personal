@@ -39,8 +39,15 @@ an **empty** database on container start, so editing it does not change a runnin
 - Content changes that must reach production go in data migrations (see
   `0003_initial_profile`, `0004_replace_seed_timeline`); `data.py` only seeds empty
   databases.
-- Styles: `portfolio/static/portfolio/css/style.css` (dark theme only; the light theme
-  rules exist but nothing turns them on)
+- Styles: `portfolio/static/portfolio/css/style.css`, a dark "cassette futurism" look
+  (1970s–80s sci-fi hardware). Fonts are self-hosted in `portfolio/static/portfolio/fonts/`:
+  Michroma only for small capital section headings, Jost for names and titles, Source
+  Sans 3 for body text, IBM Plex Mono for labels, DSEG14 for the LED readouts. Never load
+  fonts or assets from third-party domains (GDPR); keep text contrast at WCAG AA (4.5:1).
+- Skills: `.agents/skills/` (real files) with symlinks in `.claude/skills/`, tracked in
+  `skills-lock.json`. Use `web-design-guidelines` to review UI changes. Add skills one at a
+  time with `npx skills add <repo> --skill <name> -a claude-code -a github-copilot`, and
+  read their files before committing.
 - Interactivity: `portfolio/static/portfolio/js/app.js` (tabs and focus-area filter)
 - Production start-up: `scripts/run.sh` (migrate, seed, `ensure_superuser`, gunicorn).
   Static files are collected at image build time into `/vol/static` (`Dockerfile`) and

@@ -252,7 +252,8 @@ only.
 - `portfolio/models.py`, `portfolio/admin.py`: the content models and their admin pages
 - `portfolio/views.py`: the single page view
 - `portfolio/templates/portfolio/index.html`: the page template
-- `portfolio/static/portfolio/css/style.css`: all styles (dark theme)
+- `portfolio/static/portfolio/css/style.css`: all styles (dark, retro sci-fi)
+- `portfolio/static/portfolio/fonts/`: self-hosted fonts (no requests to Google or other third parties)
 - `portfolio/static/portfolio/js/app.js`: Projects/Writing tabs and focus-area filter
 - `portfolio/data.py` + `portfolio/management/commands/load_initial_data.py`: starter content
 - `portfolio/management/commands/ensure_superuser.py`: creates the admin user on start
@@ -271,7 +272,15 @@ Icons in `portfolio/templates/portfolio/icons/`: GitHub, ORCID, ResearchGate and
 [Lucide](https://lucide.dev/) (ISC). Brand logos remain their owners' trademarks and are
 used only to link to the profiles.
 
+Fonts in `portfolio/static/portfolio/fonts/`, all under the SIL Open Font License 1.1:
+Michroma, Jost, Source Sans 3 and IBM Plex Mono (via [Fontsource](https://fontsource.org/)),
+and [DSEG](https://www.keshikan.net/fonts-e.html) for the LED readouts.
+
 ## Working with AI agents
 
 Project rules for coding assistants (Claude Code, GitHub Copilot and others) are in
 [`AGENTS.md`](AGENTS.md). `CLAUDE.md` only imports it, so there is one file to maintain.
+
+Agent skills live in `.agents/skills/` (read by Copilot, Cursor and others), with symlinks in
+`.claude/skills/` for Claude Code; `skills-lock.json` records where each came from.
+Installed: `web-design-guidelines` (Vercel), which reviews UI code for accessibility and UX.

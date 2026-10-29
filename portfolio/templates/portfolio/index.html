@@ -4,19 +4,23 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07090b">
+  <link rel="icon" href="{% static 'portfolio/img/favicon.svg' %}" type="image/svg+xml">
   <title>{{ profile.name }} · {{ profile.role }}</title>
   <meta name="description" content="{{ profile.intro }}">
-  <link rel="preload" href="{% static 'portfolio/fonts/michroma-400.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'portfolio/fonts/jost-600.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'portfolio/fonts/source-sans-3-400.woff2' %}" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="{% static 'portfolio/css/style.css' %}">
 </head>
 <body>
+  <a class="skip-link" href="#main">Skip to content</a>
   <div id="root">
 
     <header class="hero">
       <div class="hero-row">
         <div class="hero-target">
           <div class="hero-photo">
-            <img src="{% static 'portfolio/img/mario-ramirez.jpg' %}" alt="{{ profile.name }}" width="400" height="400">
+            <img src="{% static 'portfolio/img/mario-ramirez.jpg' %}" alt="{{ profile.name }}" width="400" height="400" fetchpriority="high">
           </div>
           <div class="target-label mono" aria-hidden="true">ID 01</div>
         </div>
@@ -45,6 +49,7 @@
       </div>
     </header>
 
+    <main id="main">
     <section id="focus">
       <div class="section-head">
         <h2>Focus areas</h2>
@@ -52,7 +57,7 @@
       </div>
       <div class="chips">
         {% for area in focus_areas %}
-          <button class="chip" data-filter="{{ area.name }}">{{ area.name }}</button>
+          <button class="chip" data-filter="{{ area.name }}" aria-pressed="false">{{ area.name }}</button>
         {% endfor %}
       </div>
     </section>
@@ -60,17 +65,17 @@
     <section id="work">
       <div class="section-head with-tabs">
         <div class="tabs" id="work-tabs" role="tablist" aria-label="Projects and writing">
-          <button role="tab" aria-selected="true" class="tab active" data-tab="projects">Projects</button>
-          <button role="tab" aria-selected="false" class="tab" data-tab="writing">Writing</button>
+          <button role="tab" id="tab-projects" aria-controls="projects-panel" aria-selected="true" class="tab active" data-tab="projects">Projects</button>
+          <button role="tab" id="tab-writing" aria-controls="writing-panel" aria-selected="false" tabindex="-1" class="tab" data-tab="writing">Writing</button>
         </div>
-        <span class="count mono" id="work-count">{{ projects|length }} / {{ projects|length }}</span>
+        <span class="count mono" id="work-count" aria-live="polite">{{ projects|length }} / {{ projects|length }}</span>
       </div>
 
-      <div class="projects" id="projects-panel">
+      <div class="projects" id="projects-panel" role="tabpanel" aria-labelledby="tab-projects">
         {% for p in projects %}
           <div class="project" data-tag="{{ p.tag.name|default:'' }}">
             <div class="p-head">
-              <h3>{% if p.url %}<a href="{{ p.url }}" target="_blank" rel="noopener noreferrer">{{ p.name }} ↗</a>{% else %}{{ p.name }}{% endif %}</h3>
+              <h3>{% if p.url %}<a href="{{ p.url }}" target="_blank" rel="noopener noreferrer">{{ p.name }} <span aria-hidden="true">↗</span></a>{% else %}{{ p.name }}{% endif %}</h3>
               {% if p.tag %}<span class="p-tag">{{ p.tag.name }}</span>{% endif %}
             </div>
             <p>{{ p.desc }}</p>
@@ -82,7 +87,7 @@
         <div class="empty-note" id="projects-empty" hidden>No projects match that filter yet.</div>
       </div>
 
-      <div class="mesh" id="writing-panel" hidden>
+      <div class="mesh" id="writing-panel" role="tabpanel" aria-labelledby="tab-writing" hidden>
         {% for post in writing %}
           <a class="tile{% if post.span %} {{ post.span }}{% endif %}" href="{{ post.url }}" target="_blank" rel="noopener noreferrer">
             <div class="tile-head">
@@ -90,11 +95,11 @@
               <span class="tile-date mono">{{ post.date }}</span>
             </div>
             <p>{{ post.excerpt }}</p>
-            <span class="tile-source mono">{{ post.source }} ↗</span>
+            <span class="tile-source mono">{{ post.source }} <span aria-hidden="true">↗</span></span>
           </a>
         {% endfor %}
         <div class="mesh-foot">
-          Full archive on <a href="https://geomario1984.medium.com/" target="_blank" rel="noopener noreferrer">Medium ↗</a>
+          Full archive on <a href="https://geomario1984.medium.com/" target="_blank" rel="noopener noreferrer">Medium <span aria-hidden="true">↗</span></a>
         </div>
       </div>
     </section>
@@ -139,6 +144,7 @@
         </div>
       </div>
     </section>
+    </main>
 
     <footer>
       <div class="f-who">

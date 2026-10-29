@@ -33,6 +33,8 @@ function initWorkTabs() {
       const active = btn.dataset.tab === tab;
       btn.classList.toggle("active", active);
       btn.setAttribute("aria-selected", String(active));
+      // Only the active tab is in the Tab order; arrow keys move between tabs.
+      btn.tabIndex = active ? 0 : -1;
     });
     projectsPanel.hidden = tab !== "projects";
     writingPanel.hidden = tab !== "writing";
@@ -40,7 +42,17 @@ function initWorkTabs() {
     updateCount(tab);
   }
 
-  tabs.forEach((btn) => btn.addEventListener("click", () => setTab(btn.dataset.tab)));
+  tabs.forEach((btn, i) => {
+    btn.addEventListener("click", () => setTab(btn.dataset.tab));
+    btn.addEventListener("keydown", (event) => {
+      const keys = { ArrowRight: 1, ArrowLeft: -1, Home: -i, End: tabs.length - 1 - i };
+      if (!(event.key in keys)) return;
+      event.preventDefault();
+      const next = tabs[(i + keys[event.key] + tabs.length) % tabs.length];
+      setTab(next.dataset.tab);
+      next.focus();
+    });
+  });
   setTab("projects");
 }
 
@@ -59,7 +71,11 @@ function initFocusFilter() {
       const tag = chip.dataset.filter;
       activeFilter = activeFilter === tag ? null : tag;
 
-      chips.forEach((c) => c.classList.toggle("active", c.dataset.filter === activeFilter));
+      chips.forEach((c) => {
+        const on = c.dataset.filter === activeFilter;
+        c.classList.toggle("active", on);
+        c.setAttribute("aria-pressed", String(on));
+      });
 
       let visible = 0;
       projectsPanel.querySelectorAll(".project").forEach((card) => {
