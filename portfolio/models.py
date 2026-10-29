@@ -59,6 +59,9 @@ class TimelineEntry(models.Model):
     when = models.CharField(max_length=50)
     title = models.CharField(max_length=200)
     org = models.CharField(max_length=200)
+    location = models.CharField(
+        max_length=100, blank=True, help_text="Shown after the organisation, e.g. Cologne."
+    )
     body = models.TextField()
     order = models.PositiveIntegerField(default=0)
 

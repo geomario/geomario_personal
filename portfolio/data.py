@@ -17,12 +17,13 @@ FOCUS_AREAS = [
 ]
 
 # Career since 2017, current role first. "when" is the field, not a date: the
-# page deliberately shows no years, durations or locations.
+# page deliberately shows no years or durations; "location" follows the organisation.
 TIMELINE = [
     {
         "when": "Research",
         "title": "Senior Research Software Engineer",
         "org": "GESIS – Leibniz Institute for the Social Sciences",
+        "location": "Cologne",
         "body": (
             "I build, design and lead the research software and algorithms that collect and "
             "model digital behavioural data from web and mobile, supporting computational "
@@ -34,6 +35,7 @@ TIMELINE = [
         "when": "Behavioral analytics",
         "title": "Doctoral Researcher, Behavioral Analytics",
         "org": "University of Cologne",
+        "location": "Cologne",
         "body": (
             "Shoppers don't stay in one segment. Using GESIS Surf data, I model how people move "
             "between behaviours across retailers, with dynamic clusters and Markov chains, and "
@@ -45,6 +47,7 @@ TIMELINE = [
         "when": "Open finance",
         "title": "Senior Full Stack & Data Developer",
         "org": "Finerio Connect",
+        "location": "Mexico City (remote)",
         "body": (
             "Reverse-engineered, built and secured data connections to banks' APIs with Python "
             "on AWS Lambda, keeping open-finance data accurate, current and protected."
@@ -54,6 +57,7 @@ TIMELINE = [
         "when": "Legal tech",
         "title": "Head of Software Development & Data Science",
         "org": "GeoLegalTech GmbH",
+        "location": "Aachen",
         "body": (
             "Joined as a senior full-stack and data science developer, then led the "
             "company's software development and data science endeavours in legal tech."
@@ -63,6 +67,7 @@ TIMELINE = [
         "when": "Energy research",
         "title": "Research Associate, Applied Geophysics & Geothermal Energy",
         "org": "E.ON Energy Research Center",
+        "location": "Aachen",
         "body": (
             "Monitored geothermal wells with fibre-optic temperature sensing, built the "
             "PostgreSQL databases behind it, and turned the data into predictive models and "

@@ -161,6 +161,7 @@ section:last-of-type{border-bottom:none;}
 .tl-when{font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--amber); padding-top:2px;}
 .tl-what h3{font-size:17px; font-weight:500;}
 .tl-what .org{color:var(--teal); font-size:14.5px; margin-top:2px; font-family:'Source Sans 3'; font-weight:600;}
+.tl-what .tl-loc{color:var(--ink-faint); font-weight:400;}
 .tl-what p{color:var(--ink-soft); font-size:15px; margin:8px 0 0; max-width:60ch;}
 
 /* ---- Data / infra panel ---- */

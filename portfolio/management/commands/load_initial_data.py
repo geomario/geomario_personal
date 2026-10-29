@@ -29,6 +29,7 @@ class Command(BaseCommand):
                 when=row["when"],
                 title=row["title"],
                 org=row["org"],
+                location=row.get("location", ""),
                 body=row["body"],
                 order=i,
             )

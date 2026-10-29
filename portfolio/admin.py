@@ -29,7 +29,7 @@ class FocusAreaAdmin(admin.ModelAdmin):
 
 @admin.register(TimelineEntry)
 class TimelineEntryAdmin(admin.ModelAdmin):
-    list_display = ("when", "title", "org", "order")
+    list_display = ("when", "title", "org", "location", "order")
     list_editable = ("order",)
     search_fields = ("title", "org")
 

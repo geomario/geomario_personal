@@ -106,7 +106,7 @@
             <div class="tl-when mono">{{ row.when }}</div>
             <div class="tl-what">
               <h3>{{ row.title }}</h3>
-              <div class="org">{{ row.org }}</div>
+              <div class="org">{{ row.org }}{% if row.location %}<span class="tl-loc"> · {{ row.location }}</span>{% endif %}</div>
               <p>{{ row.body }}</p>
             </div>
           </div>
