@@ -16,7 +16,7 @@ MCP_NAME = "mcp-server-gesis-surf"
 GESIS_SURF = {
     "name": "GESIS Surf",
     "desc": (
-        "The open-source research infrastructure behind the GESIS Surf panel: a browser "
+        "Open-source research infrastructure for longitudinal web tracking: a browser "
         "extension sends windows, tabs, domains, clicks, scrolls and page HTML to a Django "
         "REST backend, where Celery processes it, PostgreSQL stores it and Elasticsearch "
         "makes it searchable, with ELK monitoring for long-running studies."
@@ -37,7 +37,7 @@ MOBILE = {
 MCP = {
     "desc": (
         "Connects AI agents to the GESIS Surf infrastructure through the Model Context "
-        "Protocol: a TypeScript server that lets LLM tools query the panel's PostgreSQL data "
+        "Protocol: a TypeScript server that lets LLM tools query GESIS Surf's PostgreSQL data "
         "and make tightly scoped updates (no inserts or deletes, a WHERE clause required, "
         "protected tables, validated inputs). Built with Spec-Driven Development."
     ),
