@@ -85,18 +85,15 @@ a{color:inherit;}
 .hero{padding:72px 0 40px; border-bottom:1px solid var(--line);}
 .hero-row{display:flex; gap:28px; align-items:flex-start;}
 .hero-photo{
-  width:132px; height:132px; border-radius:14px; flex-shrink:0; overflow:hidden;
-  background:var(--bg-sunken); border:1px solid var(--line-strong);
-  box-shadow:inset 0 0 24px -8px var(--amber-glow);
-  display:flex; align-items:center; justify-content:center;
-  font-family:'Newsreader', serif; font-size:46px; font-weight:500; color:var(--amber);
-  text-shadow:0 0 18px var(--amber-glow);
+  width:168px; height:168px; border-radius:14px; flex-shrink:0; overflow:hidden;
+  background:var(--bg-panel); border:1px solid var(--line-strong);
+  box-shadow:0 0 0 1px var(--line), 0 18px 40px -20px var(--amber-glow);
 }
 .hero-photo img{width:100%; height:100%; object-fit:cover; display:block;}
 .hero-text{min-width:0;}
 @media (max-width:640px){
   .hero-row{flex-direction:column; gap:20px;}
-  .hero-photo{width:92px; height:92px; font-size:32px; border-radius:12px;}
+  .hero-photo{width:112px; height:112px; border-radius:12px;}
 }
 .eyebrow{
   font-family:'IBM Plex Mono', monospace;
@@ -112,6 +109,18 @@ a{color:inherit;}
 .hero p.thesis{max-width:62ch; color:var(--ink-soft); font-size:17px; margin-top:22px;}
 .hero .meta{display:flex; flex-wrap:wrap; gap:8px 22px; margin-top:26px; font-size:14px; color:var(--ink-faint);}
 .hero .meta span{display:flex; align-items:center; gap:7px;}
+
+/* ---- Profile links (logos) ---- */
+.icon svg{width:18px; height:18px; display:block; fill:currentColor;}
+.icon svg[stroke]{fill:none;}   /* outline icons (email) */
+.links{display:flex; flex-wrap:wrap; gap:10px; margin-top:22px;}
+.icon-link{
+  width:38px; height:38px; display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid var(--line-strong); border-radius:6px; background:var(--bg-raised);
+  color:var(--ink-soft); transition:color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.icon-link:hover{color:var(--amber); border-color:var(--amber); box-shadow:var(--glow-amber);}
+.icon-link:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
 
 /* ---- Section scaffolding ---- */
 section{padding:44px 0; border-bottom:1px solid var(--line);}
@@ -184,6 +193,9 @@ section:last-of-type{border-bottom:none;}
 .project:hover{border-color:var(--amber); box-shadow:var(--glow-amber); transform:translateY(-2px);}
 .project .p-head{display:flex; align-items:start; justify-content:space-between; gap:10px;}
 .project h3{font-size:16.5px;}
+.project h3 a{color:inherit; text-decoration:none;}
+.project h3 a:hover{color:var(--amber);}
+.project h3 a:focus-visible{outline:2px solid var(--amber); outline-offset:2px;}
 .project .p-tag{font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--teal); background:rgba(95,184,196,0.08); border:1px solid rgba(95,184,196,0.25); padding:3px 8px; border-radius:4px; white-space:nowrap;}
 .project p{color:var(--ink-soft); font-size:14.5px; margin:0; flex:1;}
 .project .p-stack{display:flex; flex-wrap:wrap; gap:6px; margin-top:4px;}
@@ -238,10 +250,15 @@ section:last-of-type{border-bottom:none;}
   .tile p{display:-webkit-box !important;}
 }
 
-footer{padding:40px 0 0; display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px; align-items:baseline;}
-footer .fline{font-size:14px; color:var(--ink-faint);}
-footer a.contact{
-  font-family:'IBM Plex Mono', monospace; font-size:13.5px; color:var(--amber);
-  text-decoration:none; border-bottom:1px solid rgba(232,156,60,0.3); padding-bottom:1px;
+footer{padding:44px 0 0; border-top:1px solid var(--line); display:grid; gap:22px;}
+footer .f-name{font-family:'Newsreader', Georgia, serif; font-size:22px; font-weight:500;}
+footer .f-role{color:var(--ink-faint); font-size:14px; margin-top:2px;}
+footer .f-links{display:flex; flex-wrap:wrap; gap:10px 22px;}
+footer .f-links a{
+  display:inline-flex; align-items:center; gap:8px; color:var(--ink-soft); text-decoration:none;
+  font-family:'IBM Plex Mono', monospace; font-size:13px; transition:color .15s ease;
 }
-footer a.contact:hover{border-bottom-color:var(--amber); text-shadow:0 0 12px var(--amber-glow);}
+footer .f-links a:hover{color:var(--amber);}
+footer .f-links a:focus-visible{outline:2px solid var(--amber); outline-offset:3px;}
+footer .f-links .icon svg{width:16px; height:16px;}
+footer .f-meta{font-size:12px; color:var(--ink-faint);}

@@ -208,16 +208,18 @@ Most content is edited in the admin, under **Portfolio**:
 
 | Admin section | What it controls on the page |
 | --- | --- |
-| Focus areas | The filter chips above the projects |
-| Projects | Project cards: name, focus area (tag), description, stack (a JSON list such as `["Python", "Django"]`) |
+| Profile | The hero and footer: name, title, intro, the line above the name, location, organisation, email. There is exactly one |
+| Profile links | The logo buttons in the hero and the links in the footer (GitHub, LinkedIn, ORCID, ResearchGate, Medium) |
+| Focus areas | The filter chips above the projects (an area without projects gets no chip) |
+| Projects | Project cards: name, focus area (tag), description, stack (a JSON list such as `["Python", "Django"]`), optional link |
 | Posts | Tiles in the Writing tab. **Span** sets the tile shape: square, wide (2×1), tall (1×2) or feature (2×2) |
-| Timeline entries | The "Path" section |
+| Timeline entries | The "Path" section. **When** is the field ("Research", "Legal tech"…), not a date |
 
 Each list has an **Order** column you can edit in place; lower numbers come first.
 
-Not in the admin yet; edit `portfolio/templates/portfolio/index.html` for these: the hero
-(name, role, intro, location, email), the "Current research infrastructure" panel and the
-footer.
+Not in the admin: the photo (`portfolio/static/portfolio/img/mario-ramirez.jpg`, a 400×400
+JPEG; replace the file) and the "Current research infrastructure" panel (in
+`portfolio/templates/portfolio/index.html`).
 
 `portfolio/data.py` is only starter content. It is loaded once, into an empty database, so
 editing it later changes nothing on a running site.
@@ -260,6 +262,14 @@ only.
 - `docker/proxy/`: nginx image and its HTTP / HTTPS config templates
 - `docker/certbot/`: certbot image and the first-certificate script
 - `infra/`: Terraform for the Hetzner server (run through `docker/terraform.sh`)
+
+## Credits
+
+Icons in `portfolio/templates/portfolio/icons/`: GitHub, ORCID, ResearchGate and Medium from
+[Simple Icons](https://simpleicons.org/) (CC0); LinkedIn from
+[Font Awesome Free](https://fontawesome.com/license/free) (CC BY 4.0); email from
+[Lucide](https://lucide.dev/) (ISC). Brand logos remain their owners' trademarks and are
+used only to link to the profiles.
 
 ## Working with AI agents
 

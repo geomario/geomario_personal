@@ -1,19 +1,28 @@
+import importlib
 import os
 from io import StringIO
 from unittest import mock
 
+from django.apps import apps as django_apps
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from portfolio import data
-from portfolio.models import FocusArea, Post, Project, TimelineEntry
+from portfolio.models import FocusArea, Post, ProfileLink, Project, TimelineEntry
 
 
 def run(command):
     call_command(command, stdout=StringIO())
 
 
+# Tests run with DEBUG off, where the manifest storage only knows the static files
+# collected when the image was built; plain storage keeps new files from failing.
+@override_settings(STORAGES={
+    **settings.STORAGES,
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+})
 class IndexTests(TestCase):
     def test_renders_seeded_content(self):
         run("load_initial_data")
@@ -25,6 +34,32 @@ class IndexTests(TestCase):
     def test_cannot_be_framed(self):
         response = self.client.get("/")
         self.assertEqual(response["X-Frame-Options"], "DENY")
+
+    def test_shows_profile_and_links_from_migration(self):
+        response = self.client.get("/")
+        self.assertContains(response, "<h1>Mario Ramirez</h1>", html=True)
+        for link in ProfileLink.objects.all():
+            self.assertContains(response, f'href="{link.url}"')
+        self.assertContains(response, 'href="mailto:marm1984@gmail.com"')
+
+    def test_hides_focus_areas_without_projects(self):
+        FocusArea.objects.create(name="Empty area")
+        used = FocusArea.objects.create(name="Used area")
+        Project.objects.create(name="P", tag=used, desc="d")
+        response = self.client.get("/")
+        self.assertContains(response, 'data-filter="Used area"')
+        self.assertNotContains(response, 'data-filter="Empty area"')
+
+    def test_project_without_tag_or_url(self):
+        Project.objects.create(name="Untagged", desc="d")
+        response = self.client.get("/")
+        self.assertContains(response, 'data-tag=""')
+        self.assertNotContains(response, "None")
+
+    def test_project_url_is_a_link(self):
+        Project.objects.create(name="Linked", desc="d", url="https://example.com/repo")
+        response = self.client.get("/")
+        self.assertContains(response, 'href="https://example.com/repo"')
 
 
 class LoadInitialDataTests(TestCase):
@@ -44,6 +79,24 @@ class LoadInitialDataTests(TestCase):
         run("load_initial_data")
         self.assertEqual(FocusArea.objects.count(), 0)
         self.assertEqual(Project.objects.count(), len(data.PROJECTS))
+
+
+class ReplaceSeedTimelineTests(TestCase):
+    migration = importlib.import_module("portfolio.migrations.0004_replace_seed_timeline")
+
+    def test_replaces_placeholders_and_keeps_other_entries(self):
+        for title in self.migration.PLACEHOLDER_TITLES:
+            TimelineEntry.objects.create(when="x", title=title, org="o", body="b")
+        TimelineEntry.objects.create(when="x", title="Added in the admin", org="o", body="b")
+        self.migration.replace_placeholders(django_apps, None)
+        titles = set(TimelineEntry.objects.values_list("title", flat=True))
+        self.assertFalse(titles & set(self.migration.PLACEHOLDER_TITLES))
+        self.assertIn("Added in the admin", titles)
+        self.assertEqual(len(titles), len(self.migration.TIMELINE) + 1)
+
+    def test_does_nothing_without_placeholders(self):
+        self.migration.replace_placeholders(django_apps, None)
+        self.assertFalse(TimelineEntry.objects.exists())
 
 
 class EnsureSuperuserTests(TestCase):

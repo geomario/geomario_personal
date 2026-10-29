@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mario, Software Architect</title>
+  <title>{{ profile.name }} · {{ profile.role }}</title>
+  <meta name="description" content="{{ profile.intro }}">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
   <link rel="stylesheet" href="{% static 'portfolio/css/style.css' %}">
 </head>
@@ -13,21 +14,30 @@
 
     <header class="hero">
       <div class="hero-row">
-        <div class="hero-photo" aria-hidden="true">M</div>
+        <div class="hero-photo">
+          <img src="{% static 'portfolio/img/mario-ramirez.jpg' %}" alt="{{ profile.name }}" width="400" height="400">
+        </div>
         <div class="hero-text">
-          <div class="eyebrow">Available for architecture &amp; research-engineering conversations</div>
-          <h1>Mario</h1>
-          <div class="role">Software Research Engineer &amp; PhD Candidate, Computational Social Science</div>
-          <p class="thesis">
-            I design and operate the data infrastructure behind large-scale behavioral research —
-            then turn what it captures into published, defensible findings. Geosciences background,
-            self-taught engineer, now building for scale in academia.
-          </p>
+          {% if profile.availability %}<div class="eyebrow">{{ profile.availability }}</div>{% endif %}
+          <h1>{{ profile.name }}</h1>
+          <div class="role">{{ profile.role }}</div>
+          <p class="thesis">{{ profile.intro }}</p>
           <div class="meta">
-            <span>📍 Aachen, Germany</span>
-            <span class="mono">marm1984@gmail.com</span>
-            <span>GESIS – Leibniz Institute for the Social Sciences</span>
+            {% if profile.location %}<span>{{ profile.location }}</span>{% endif %}
+            {% if profile.organisation %}<span>{{ profile.organisation }}</span>{% endif %}
           </div>
+          <nav class="links" aria-label="Profiles">
+            {% for link in links %}
+              <a class="icon-link" href="{{ link.url }}" target="_blank" rel="noopener noreferrer" aria-label="{{ link }}" title="{{ link }}">
+                <span class="icon" aria-hidden="true">{% include link.icon_template %}</span>
+              </a>
+            {% endfor %}
+            {% if profile.email %}
+              <a class="icon-link" href="mailto:{{ profile.email }}" aria-label="Email {{ profile.email }}" title="{{ profile.email }}">
+                <span class="icon" aria-hidden="true">{% include "portfolio/icons/email.svg" %}</span>
+              </a>
+            {% endif %}
+          </nav>
         </div>
       </div>
     </header>
@@ -39,7 +49,7 @@
       </div>
       <div class="chips">
         {% for area in focus_areas %}
-          <button class="chip" data-filter="{{ area }}">{{ area }}</button>
+          <button class="chip" data-filter="{{ area.name }}">{{ area.name }}</button>
         {% endfor %}
       </div>
     </section>
@@ -55,10 +65,10 @@
 
       <div class="projects" id="projects-panel">
         {% for p in projects %}
-          <div class="project" data-tag="{{ p.tag }}">
+          <div class="project" data-tag="{{ p.tag.name|default:'' }}">
             <div class="p-head">
-              <h3>{{ p.name }}</h3>
-              <span class="p-tag">{{ p.tag }}</span>
+              <h3>{% if p.url %}<a href="{{ p.url }}" target="_blank" rel="noopener noreferrer">{{ p.name }} ↗</a>{% else %}{{ p.name }}{% endif %}</h3>
+              {% if p.tag %}<span class="p-tag">{{ p.tag.name }}</span>{% endif %}
             </div>
             <p>{{ p.desc }}</p>
             <div class="p-stack">
@@ -127,8 +137,23 @@
     </section>
 
     <footer>
-      <span class="fline">Django · PostgreSQL · Blade Runner-elegant terminal aesthetic.</span>
-      <a class="contact" href="mailto:marm1984@gmail.com">marm1984@gmail.com ↗</a>
+      <div class="f-who">
+        <div class="f-name">{{ profile.name }}</div>
+        <div class="f-role">{{ profile.role }}</div>
+      </div>
+      <nav class="f-links" aria-label="Profiles and contact">
+        {% for link in links %}
+          <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+            <span class="icon" aria-hidden="true">{% include link.icon_template %}</span>{{ link }}
+          </a>
+        {% endfor %}
+        {% if profile.email %}
+          <a href="mailto:{{ profile.email }}">
+            <span class="icon" aria-hidden="true">{% include "portfolio/icons/email.svg" %}</span>{{ profile.email }}
+          </a>
+        {% endif %}
+      </nav>
+      <div class="f-meta mono">© {% now "Y" %} {{ profile.name }}{% if profile.location %} · {{ profile.location }}{% endif %}</div>
     </footer>
 
   </div>

@@ -1,15 +1,10 @@
 """
-Content for the portfolio page.
+Starter content for the portfolio page.
 
-This is the Django equivalent of the TIMELINE / PROJECTS / WRITING /
-FOCUS_AREAS arrays in the React version — plain Python data, rendered
-by portfolio/templates/portfolio/index.html.
-
-For an MVP this is enough. If you outgrow hand-editing this file, the
-natural next step is to turn these into Django models (Project, Post,
-TimelineEntry) and manage them from /admin instead — the templates
-would not need to change, since they already just loop over lists of
-dicts with these same keys.
+load_initial_data copies this into an empty database once; after that the
+content lives in the database and is edited in /admin, so changing this file
+does not change a running site. The profile and its links come from
+migration 0003 instead.
 """
 
 FOCUS_AREAS = [
@@ -19,41 +14,61 @@ FOCUS_AREAS = [
     "Leadership",
 ]
 
+# Career since 2017, oldest first. "when" is the field, not a date: the page
+# deliberately shows no years, durations or locations.
 TIMELINE = [
     {
-        "when": "Earlier",
-        "title": "Geosciences → self-taught engineering",
-        "org": "Independent transition",
+        "when": "Energy research",
+        "title": "Research Associate, Applied Geophysics & Geothermal Energy",
+        "org": "E.ON Energy Research Center",
         "body": (
-            "Started in the geosciences, then taught myself full-stack development "
-            "from first principles — no formal CS degree, learned by shipping."
+            "Monitored geothermal wells with fibre-optic temperature sensing, built the "
+            "PostgreSQL databases behind it, and turned the data into predictive models and "
+            "numerical reservoir simulations."
         ),
     },
     {
-        "when": "Industry",
-        "title": "Engineering leadership",
-        "org": "Head of Engineering, industry",
+        "when": "Legal tech",
+        "title": "Head of Software Development & Data Science",
+        "org": "GeoLegalTech GmbH",
         "body": (
-            "Led an engineering team before moving into academic research — the kind "
-            "of role that makes you care about maintainability, not just features."
+            "Joined as a senior full-stack and data science developer, then led the "
+            "company's software development and data science."
         ),
     },
     {
-        "when": "Transition",
-        "title": "Visiting researcher",
-        "org": "Self-funded, Germany",
+        "when": "Open finance",
+        "title": "Senior Full Stack & Data Developer",
+        "org": "Finerio Connect",
         "body": (
-            "Relocated to Germany as a visiting researcher, funded independently, "
-            "before taking up a permanent academic post."
+            "Built and secured data connections to banks' APIs with Python on AWS Lambda, "
+            "keeping open-finance data accurate, current and protected."
         ),
     },
     {
-        "when": "Now",
-        "title": "Software Research Engineer & PhD Candidate",
-        "org": "GESIS – Leibniz Institute for the Social Sciences · DDD Team",
+        "when": "Education",
+        "title": "Postgraduate Diploma, Data Science & Artificial Intelligence",
+        "org": "University of London",
+        "body": "Machine learning, data science and artificial intelligence.",
+    },
+    {
+        "when": "Research",
+        "title": "Senior Research Software Engineer",
+        "org": "GESIS – Leibniz Institute for the Social Sciences",
         "body": (
-            "Building and operating the data infrastructure behind large-scale "
-            "computational social science research, based in Aachen."
+            "Building the software and algorithms that collect and model digital behavioural "
+            "data from web and mobile, and supporting researchers from study design to "
+            "publication, with open science as the default."
+        ),
+    },
+    {
+        "when": "Doctorate",
+        "title": "Doctoral Researcher, IT & Business Analytics",
+        "org": "University of Cologne",
+        "body": (
+            "Web-tracking studies of how consumers move through digital journeys: clickstreams, "
+            "page snapshots and purchases, clustered into shopper segments that show where "
+            "journeys convert."
         ),
     },
 ]

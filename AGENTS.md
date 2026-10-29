@@ -32,8 +32,13 @@ an **empty** database on container start, so editing it does not change a runnin
 
 - Settings: `mario_portfolio/settings.py`, all from environment variables (see README)
 - Models / admin / view: `portfolio/models.py`, `portfolio/admin.py`, `portfolio/views.py`
-- Template: `portfolio/templates/portfolio/index.html`. The hero, the infrastructure
-  panel and the footer are hard-coded here, not in the database.
+- Template: `portfolio/templates/portfolio/index.html`. Hero and footer come from the
+  `Profile` and `ProfileLink` models (admin); only the infrastructure panel is hard-coded.
+  Link logos are SVGs in `portfolio/templates/portfolio/icons/<kind>.svg` (credits in
+  README). The photo is `portfolio/static/portfolio/img/mario-ramirez.jpg`.
+- Content changes that must reach production go in data migrations (see
+  `0003_initial_profile`, `0004_replace_seed_timeline`); `data.py` only seeds empty
+  databases.
 - Styles: `portfolio/static/portfolio/css/style.css` (dark theme only; the light theme
   rules exist but nothing turns them on)
 - Interactivity: `portfolio/static/portfolio/js/app.js` (tabs and focus-area filter)
