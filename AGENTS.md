@@ -2,7 +2,8 @@
 
 ## Project
 
-Mario's one-page portfolio site. Django 5 (one app, `portfolio`), server-rendered
+Mario's one-page portfolio site with hosted articles. Django 5 (apps `portfolio` and
+`articles`), server-rendered
 templates, plain JavaScript (no framework, no build step), PostgreSQL 16, Python 3.13.
 Development: `docker-compose.yml` (code mounted, `runserver`). Production:
 `docker-compose.deploy.yml` (gunicorn + whitenoise behind nginx with Let's Encrypt,
@@ -32,7 +33,14 @@ an **empty** database on container start, so editing it does not change a runnin
 
 - Settings: `mario_portfolio/settings.py`, all from environment variables (see README)
 - Models / admin / view: `portfolio/models.py`, `portfolio/admin.py`, `portfolio/views.py`
-- Template: `portfolio/templates/portfolio/index.html`. Hero and footer come from the
+- Articles: `articles/` app. Details in the `Article` model (admin); text and images in
+  `articles/content/<slug>/` (`index.md` + `images/`), rendered by `articles/rendering.py`.
+  Images are exposed as static files by `articles/finders.py` (images only, never the
+  Markdown); everything after `<!-- not-for-publication -->` is left off the page. Drafts
+  are visible to staff only. See README "Articles".
+- Templates: `portfolio/templates/portfolio/base.html` (shared head, fonts and footer;
+  pages get `profile`/`links` from `portfolio/site.py`) and
+  `portfolio/templates/portfolio/index.html`. Hero and footer come from the
   `Profile` and `ProfileLink` models (admin); only the infrastructure panel is hard-coded.
   Link logos are SVGs in `portfolio/templates/portfolio/icons/<kind>.svg` (credits in
   README). The photo is `portfolio/static/portfolio/img/mario-ramirez.jpg`.

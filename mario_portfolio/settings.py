@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "portfolio",
+    "articles",
 ]
 
 MIDDLEWARE = [
@@ -111,5 +112,14 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    # Images next to each article's Markdown, served as static/articles/<slug>/...
+    "articles.finders.ArticleAssetsFinder",
+]
+
+# One folder per article: <slug>/index.md plus its images/ (see articles/rendering.py).
+ARTICLES_CONTENT_DIR = BASE_DIR / "articles" / "content"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

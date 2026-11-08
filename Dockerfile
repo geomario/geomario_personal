@@ -28,6 +28,7 @@ RUN adduser \
 COPY ./manage.py /app/manage.py
 COPY ./mario_portfolio /app/mario_portfolio/
 COPY ./portfolio /app/portfolio/
+COPY ./articles /app/articles/
 COPY ./scripts /scripts/
 
 # Static files only change with the code, so collect them once at build time

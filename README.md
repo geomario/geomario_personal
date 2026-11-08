@@ -1,7 +1,8 @@
 # Mario — portfolio (Django)
 
-A one-page portfolio site. Django renders the page from content stored in PostgreSQL, and
-you edit that content in the Django admin. The page's tabs and filter chips use a small
+A one-page portfolio site with article pages. Django renders the page from content stored
+in PostgreSQL, and you edit that content in the Django admin; article text is Markdown in
+the repository (see "Articles"). The page's tabs and filter chips use a small
 plain-JavaScript file; there is no frontend framework and no build step.
 
 **Stack:** Python 3.13, Django 5, PostgreSQL 16, gunicorn, whitenoise, nginx + Let's
@@ -224,6 +225,44 @@ JPEG; replace the file) and the "Current research infrastructure" panel (in
 `portfolio/data.py` is only starter content. It is loaded once, into an empty database, so
 editing it later changes nothing on a running site.
 
+## Articles
+
+Full articles hosted on this site, at `/writing/<slug>/`, live in the `articles` app. Posts
+(above) only link out to Medium; articles have their own page and their own Writing tile.
+
+Each article is one folder in the repository:
+
+```
+articles/content/<slug>/
+├── index.md        the text, in Markdown
+└── images/         its images, referenced from index.md as images/<file>
+```
+
+The details are in the admin under **Articles**: slug (the folder name), title, date,
+excerpt (tile text and page description), tile span, Medium URL and **Is published**.
+
+- Image paths stay relative in `index.md`, so the file previews correctly in an editor. On
+  the page they become absolute URLs (`https://<domain>/static/articles/<slug>/images/…`),
+  which Medium's importer needs. The images are collected as static files when the image is
+  built (`articles/finders.py`); the Markdown itself is never served.
+- A line `<!-- not-for-publication -->` ends the published part: anything below it (notes,
+  image manifests) stays in the file but not on the page. The file's top `# heading` is
+  dropped because the page shows the title from the admin.
+- Drafts (**Is published** off) return 404 to visitors but are visible to staff logged in to
+  `/admin`, with a "Draft" note and `noindex`, so you can check them on the live site.
+- Tables, fenced code and heading anchors work. The Markdown is rendered as trusted content,
+  since only the site owner can change it.
+
+To add one: create the folder, commit it, and add the article in the admin. To have it in
+production without the admin, add a data migration like
+`articles/migrations/0002_packet_analysis_chapter_1.py`. New images need a deploy (they are
+static files).
+
+**Republishing on Medium:** once an article is published here, use Medium's *Import a
+story* with its URL. Medium creates a draft from the page and sets the canonical link to
+this site; check the images in the draft, then paste the Medium URL into the article's
+**Medium URL** field to link the two.
+
 ## Configuration
 
 Settings come from environment variables. In development, `docker-compose.yml` sets them
@@ -251,13 +290,18 @@ only.
 - `mario_portfolio/settings.py`: settings (environment-driven)
 - `portfolio/models.py`, `portfolio/admin.py`: the content models and their admin pages
 - `portfolio/views.py`: the single page view
-- `portfolio/templates/portfolio/index.html`: the page template
+- `portfolio/templates/portfolio/base.html`: shared layout (head, fonts, footer) for every page
+- `portfolio/templates/portfolio/index.html`: the home page
+- `portfolio/site.py`: context every page needs (profile and links for the footer)
+- `articles/`: hosted articles: model and admin, `rendering.py` (Markdown to HTML),
+  `finders.py` (article images as static files), `views.py`, `templates/articles/article.html`,
+  `content/<slug>/` (the articles themselves), `tests.py`
 - `portfolio/static/portfolio/css/style.css`: all styles (dark, retro sci-fi)
 - `portfolio/static/portfolio/fonts/`: self-hosted fonts (no requests to Google or other third parties)
 - `portfolio/static/portfolio/js/app.js`: Projects/Writing tabs and focus-area filter
 - `portfolio/data.py` + `portfolio/management/commands/load_initial_data.py`: starter content
 - `portfolio/management/commands/ensure_superuser.py`: creates the admin user on start
-- `portfolio/tests.py`: tests
+- `portfolio/tests.py`, `articles/tests.py`: tests
 - `scripts/run.sh`: what the production app container runs on start
 - `scripts/deploy.sh`: deploys one commit on the server (run by GitHub Actions)
 - `docker/proxy/`: nginx image and its HTTP / HTTPS config templates
