@@ -1,0 +1,30 @@
+{% extends "portfolio/base.html" %}
+
+{% block title %}Experience · {{ profile.name }}{% endblock %}
+{% block meta %}<meta name="description" content="Research, engineering and leadership roles of {{ profile.name }}.">{% endblock %}
+
+{% block content %}
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <h1>Experience</h1>
+      <p class="lead">Research, engineering and leadership roles, most recent first.</p>
+    </header>
+
+    <div class="work-grid">
+      <ol class="timeline">
+        {% for row in timeline %}
+          <li class="tl-row">
+            <p class="tl-when">{{ row.when }}</p>
+            <div class="tl-what">
+              <h2>{{ row.title }}</h2>
+              <p class="org">{{ row.org }}{% if row.location %}<span class="tl-loc"> · {{ row.location }}</span>{% endif %}</p>
+              <p class="tl-body">{{ row.body }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+
+      {% include "portfolio/_infra_card.html" %}
+    </div>
+  </main>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "portfolio/base.html" %}
+{% load static %}
+
+{% block title %}About · {{ profile.name }}{% endblock %}
+{% block meta %}<meta name="description" content="{% if profile.about %}{{ profile.about|truncatewords:30 }}{% else %}{{ profile.intro }}{% endif %}">{% endblock %}
+
+{% block content %}
+  <main id="main" class="wrap">
+    <div class="about">
+      <div class="about-text">
+        <h1>{{ profile.name }}</h1>
+        <p class="role">{{ profile.role }}</p>
+        <div class="about-body">
+          {% if profile.about %}{{ profile.about|linebreaks }}{% else %}<p>{{ profile.intro }}</p>{% endif %}
+        </div>
+        {% if profile.location or profile.organisation %}
+          <p class="meta">
+            {% if profile.organisation %}<span>{{ profile.organisation }}</span>{% endif %}
+            {% if profile.location %}<span>{{ profile.location }}</span>{% endif %}
+          </p>
+        {% endif %}
+      </div>
+      <div class="about-photo">
+        <img class="portrait" src="{% static 'portfolio/img/mario-ramirez.jpg' %}" alt="{{ profile.name }}" width="400" height="400" fetchpriority="high">
+      </div>
+      <ul class="profile-list" aria-label="Profiles and contact">
+        {% for link in links %}
+          <li>
+            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer">
+              <span class="icon" aria-hidden="true">{% include link.icon_template %}</span>{{ link }}
+            </a>
+          </li>
+        {% endfor %}
+        {% if profile.email %}
+          <li class="profile-email">
+            <a href="mailto:{{ profile.email }}">
+              <span class="icon" aria-hidden="true">{% include "portfolio/icons/email.svg" %}</span>{{ profile.email }}
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </main>
+{% endblock %}

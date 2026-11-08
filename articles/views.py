@@ -24,6 +24,7 @@ def detail(request, slug):
 
     context = {
         **site_context(),
+        "active": "writing",
         "article": article,
         # Written by the site owner and stored in the repository, not user input.
         "body": mark_safe(rendered.html),

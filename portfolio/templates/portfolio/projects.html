@@ -1,0 +1,42 @@
+{% extends "portfolio/base.html" %}
+
+{% block title %}Projects · {{ profile.name }}{% endblock %}
+{% block meta %}<meta name="description" content="Research software, data infrastructure and machine-learning models by {{ profile.name }}.">{% endblock %}
+
+{% block content %}
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <h1>Projects</h1>
+      <p class="lead">Research software, data infrastructure and machine-learning models.</p>
+    </header>
+
+    {% if focus_areas %}
+      <div class="filter-row">
+        <div class="chips" id="focus" role="group" aria-label="Filter projects by focus area">
+          {% for area in focus_areas %}
+            <button type="button" class="chip" data-filter="{{ area.name }}" aria-pressed="false">{{ area.name }}</button>
+          {% endfor %}
+        </div>
+        <span class="count" id="project-count" aria-live="polite">{{ projects|length }} project{{ projects|length|pluralize }}</span>
+      </div>
+    {% endif %}
+
+    <ul class="project-grid" id="projects-panel">
+      {% for p in projects %}
+        <li class="project" data-tag="{{ p.tag.name|default:'' }}">
+          {% if p.tag %}<span class="tag">{{ p.tag.name }}</span>{% endif %}
+          <h2>{% if p.url %}<a class="card-link" href="{{ p.url }}" target="_blank" rel="noopener noreferrer">{{ p.name }}</a>{% else %}{{ p.name }}{% endif %}</h2>
+          <p class="desc">{{ p.desc }}</p>
+          {% if p.stack %}<p class="stack">{{ p.stack|join:" · " }}</p>{% endif %}
+          {% if p.url %}
+            <span class="card-url" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 10.5 10.5 5.5M6.5 5.5h4v4"/></svg>
+              <span>{{ p.url|cut:"https://"|cut:"http://"|cut:"www." }}</span>
+            </span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    <p class="empty-note" id="projects-empty" hidden>No projects match that filter yet.</p>
+  </main>
+{% endblock %}

@@ -2,7 +2,7 @@
 
 ## Project
 
-Mario's one-page portfolio site with hosted articles. Django 5 (apps `portfolio` and
+Mario's portfolio site (Home, About, Projects, Writing, Experience) with hosted articles. Django 5 (apps `portfolio` and
 `articles`), server-rendered
 templates, plain JavaScript (no framework, no build step), PostgreSQL 16, Python 3.13.
 Development: `docker-compose.yml` (code mounted, `runserver`). Production:
@@ -38,25 +38,29 @@ an **empty** database on container start, so editing it does not change a runnin
   Images are exposed as static files by `articles/finders.py` (images only, never the
   Markdown); everything after `<!-- not-for-publication -->` is left off the page. Drafts
   are visible to staff only. See README "Articles".
-- Templates: `portfolio/templates/portfolio/base.html` (shared head, fonts and footer;
-  pages get `profile`/`links` from `portfolio/site.py`) and
-  `portfolio/templates/portfolio/index.html`. Hero and footer come from the
-  `Profile` and `ProfileLink` models (admin); only the infrastructure panel is hard-coded.
+- Templates: `portfolio/templates/portfolio/base.html` (shared head, header with the pill
+  navigation and theme switch, footer; pages get `profile`/`links` from
+  `portfolio/site.py` and `active` from their view) and one template per page
+  (`index.html` is Home), plus `_tile.html` and `_infra_card.html`. Profile text and links
+  come from the `Profile` and `ProfileLink` models (admin); only the infrastructure card
+  is hard-coded.
   Link logos are SVGs in `portfolio/templates/portfolio/icons/<kind>.svg` (credits in
   README). The photo is `portfolio/static/portfolio/img/mario-ramirez.jpg`.
 - Content changes that must reach production go in data migrations (see
   `0003_initial_profile`, `0004_replace_seed_timeline`); `data.py` only seeds empty
   databases.
-- Styles: `portfolio/static/portfolio/css/style.css`, a dark "cassette futurism" look
-  (1970s–80s sci-fi hardware). Fonts are self-hosted in `portfolio/static/portfolio/fonts/`:
-  Michroma only for small capital section headings, Jost for names and titles, Source
-  Sans 3 for body text, IBM Plex Mono for labels, DSEG14 for the LED readouts. Never load
+- Styles: `portfolio/static/portfolio/css/style.css`, slate colours with one teal accent
+  in a light and a dark theme (tokens at the top; dark follows the system unless the
+  switch, saved in `localStorage`, says otherwise). Follow the gradient rule written at the
+  top of the file: gradients only fade the accent into the surface, subtly, at 155°.
+  Fonts are self-hosted in `portfolio/static/portfolio/fonts/`: Jost for headings, Source
+  Sans 3 for body text, IBM Plex Mono for small labels. Never load
   fonts or assets from third-party domains (GDPR); keep text contrast at WCAG AA (4.5:1).
 - Skills: `.agents/skills/` (real files) with symlinks in `.claude/skills/`, tracked in
   `skills-lock.json`. Use `web-design-guidelines` to review UI changes. Add skills one at a
   time with `npx skills add <repo> --skill <name> -a claude-code -a github-copilot`, and
   read their files before committing.
-- Interactivity: `portfolio/static/portfolio/js/app.js` (tabs and focus-area filter)
+- Interactivity: `portfolio/static/portfolio/js/app.js` (theme switch, focus-area filter, pointer glow)
 - Production start-up: `scripts/run.sh` (migrate, seed, `ensure_superuser`, gunicorn).
   Static files are collected at image build time into `/vol/static` (`Dockerfile`) and
   served by whitenoise.

@@ -1,69 +1,53 @@
-// Vanilla-JS equivalent of the React version's useState hooks.
-// Two independent pieces of UI state, each mirrored with plain DOM
-// attributes instead of a virtual DOM: the Projects/Writing tab, and
-// the focus-area filter.
+// Small progressive enhancements; every page works without them.
+// - the light/dark theme switch (a saved choice is applied by an inline script in <head>)
+// - the focus-area filter on the Projects page
+// - a soft light that follows the mouse
 
 document.addEventListener("DOMContentLoaded", () => {
-  initWorkTabs();
+  initThemeToggle();
   initFocusFilter();
+  initPointerGlow();
 });
 
-function initWorkTabs() {
-  const tabs = document.querySelectorAll("#work-tabs .tab");
-  const projectsPanel = document.getElementById("projects-panel");
-  const writingPanel = document.getElementById("writing-panel");
-  const focusSection = document.getElementById("focus");
-  const countEl = document.getElementById("work-count");
-  if (!tabs.length || !projectsPanel || !writingPanel || !countEl) return;
+function initThemeToggle() {
+  const button = document.querySelector(".theme-toggle");
+  if (!button) return;
+  const root = document.documentElement;
+  const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+  const current = () => root.dataset.theme || (systemDark.matches ? "dark" : "light");
 
-  const projectCount = projectsPanel.querySelectorAll(".project").length;
-  const writingCount = writingPanel.querySelectorAll(".tile").length;
+  function sync() {
+    const theme = current();
+    const label = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+    button.dataset.current = theme;
+    button.setAttribute("aria-label", label);
+    button.title = label;
+  }
 
-  function updateCount(tab) {
-    if (tab === "projects") {
-      const visible = projectsPanel.querySelectorAll(".project:not([hidden])").length;
-      countEl.textContent = `${visible} / ${projectCount}`;
-    } else {
-      countEl.textContent = `${writingCount} posts`;
+  button.addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem("theme", next);
+    } catch {
+      // Storage can be blocked (private mode); the switch still works for this page.
     }
-  }
-
-  function setTab(tab) {
-    tabs.forEach((btn) => {
-      const active = btn.dataset.tab === tab;
-      btn.classList.toggle("active", active);
-      btn.setAttribute("aria-selected", String(active));
-      // Only the active tab is in the Tab order; arrow keys move between tabs.
-      btn.tabIndex = active ? 0 : -1;
-    });
-    projectsPanel.hidden = tab !== "projects";
-    writingPanel.hidden = tab !== "writing";
-    if (focusSection) focusSection.hidden = tab !== "projects";
-    updateCount(tab);
-  }
-
-  tabs.forEach((btn, i) => {
-    btn.addEventListener("click", () => setTab(btn.dataset.tab));
-    btn.addEventListener("keydown", (event) => {
-      const keys = { ArrowRight: 1, ArrowLeft: -1, Home: -i, End: tabs.length - 1 - i };
-      if (!(event.key in keys)) return;
-      event.preventDefault();
-      const next = tabs[(i + keys[event.key] + tabs.length) % tabs.length];
-      setTab(next.dataset.tab);
-      next.focus();
-    });
+    sync();
   });
-  setTab("projects");
+  systemDark.addEventListener("change", sync);
+  sync();
+  button.hidden = false;
 }
 
 function initFocusFilter() {
   const chips = document.querySelectorAll("#focus .chip");
-  const projectsPanel = document.getElementById("projects-panel");
+  const cards = document.querySelectorAll("#projects-panel .project");
   const emptyNote = document.getElementById("projects-empty");
-  const countEl = document.getElementById("work-count");
-  if (!chips.length || !projectsPanel) return;
+  const countEl = document.getElementById("project-count");
+  if (!chips.length || !cards.length) return;
 
-  const projectCount = projectsPanel.querySelectorAll(".project").length;
+  const total = cards.length;
+  const allLabel = countEl ? countEl.textContent : "";
   let activeFilter = null;
 
   chips.forEach((chip) => {
@@ -71,21 +55,39 @@ function initFocusFilter() {
       const tag = chip.dataset.filter;
       activeFilter = activeFilter === tag ? null : tag;
 
-      chips.forEach((c) => {
-        const on = c.dataset.filter === activeFilter;
-        c.classList.toggle("active", on);
-        c.setAttribute("aria-pressed", String(on));
-      });
+      chips.forEach((c) => c.setAttribute("aria-pressed", String(c.dataset.filter === activeFilter)));
 
       let visible = 0;
-      projectsPanel.querySelectorAll(".project").forEach((card) => {
+      cards.forEach((card) => {
         const matches = !activeFilter || card.dataset.tag === activeFilter;
         card.hidden = !matches;
         if (matches) visible += 1;
       });
 
       if (emptyNote) emptyNote.hidden = visible !== 0;
-      if (countEl) countEl.textContent = `${visible} / ${projectCount}`;
+      if (countEl) countEl.textContent = activeFilter ? `${visible} of ${total}` : allLabel;
     });
   });
+}
+
+function initPointerGlow() {
+  const glow = document.querySelector(".glow");
+  const finePointer = window.matchMedia("(pointer: fine)").matches;
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!glow || !finePointer || reducedMotion) return;
+
+  let pending = 0;
+  window.addEventListener(
+    "pointermove",
+    (event) => {
+      if (pending) return;
+      pending = requestAnimationFrame(() => {
+        glow.style.setProperty("--gx", `${event.clientX}px`);
+        glow.style.setProperty("--gy", `${event.clientY}px`);
+        glow.classList.add("on");
+        pending = 0;
+      });
+    },
+    { passive: true },
+  );
 }

@@ -1,0 +1,18 @@
+{% extends "portfolio/base.html" %}
+
+{% block title %}Writing · {{ profile.name }}{% endblock %}
+{% block meta %}<meta name="description" content="Articles and posts by {{ profile.name }}.">{% endblock %}
+
+{% block content %}
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <h1>Writing</h1>
+      <p class="lead">Notes on what inspires me: research, code and curiosity.</p>
+      <a class="more-link" href="https://geomario1984.medium.com/" target="_blank" rel="noopener noreferrer">All posts on Medium <span aria-hidden="true">↗</span></a>
+    </header>
+
+    <div class="mesh">
+      {% for item in items %}{% include "portfolio/_tile.html" with h="h2" %}{% endfor %}
+    </div>
+  </main>
+{% endblock %}

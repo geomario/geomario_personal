@@ -16,28 +16,29 @@
 {% endblock %}
 
 {% block content %}
-  <nav class="article-top" aria-label="Site">
-    <a class="back-link mono" href="{% url 'index' %}"><span aria-hidden="true">←</span> {{ profile.name|default:"Portfolio" }}</a>
-  </nav>
+  <main id="main" class="wrap article-main">
+    <div class="article-col">
+      <a class="back-button" href="{% url 'writing' %}" aria-label="Back to writing" title="Back to writing">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 8H3M7 4 3 8l4 4"/></svg>
+      </a>
+      <article class="article">
+        <header class="article-header">
+          {% if not article.is_published %}
+            <p class="draft-note">Draft: only visible to staff. Publish it in the admin.</p>
+          {% endif %}
+          <time class="article-date" datetime="{{ article.date|date:'Y-m-d' }}">{{ article.date|date:"j F Y" }}</time>
+          <h1>{{ article.title }}</h1>
+          {% if profile %}<p class="article-byline">By {{ profile.name }}</p>{% endif %}
+        </header>
 
-  <main id="main">
-    <article class="article">
-      <header class="article-header">
-        {% if not article.is_published %}
-          <p class="draft-note mono">Draft: only visible to staff. Publish it in the admin.</p>
+        <div class="prose">
+          {{ body }}
+        </div>
+
+        {% if article.medium_url %}
+          <p class="article-foot">Also on <a href="{{ article.medium_url }}" target="_blank" rel="noopener noreferrer">Medium <span aria-hidden="true">↗</span></a></p>
         {% endif %}
-        <div class="article-kicker mono">Article · <time datetime="{{ article.date|date:'Y-m-d' }}">{{ article.date|date:"j M Y" }}</time></div>
-        <h1>{{ article.title }}</h1>
-        {% if profile %}<p class="article-byline mono">By {{ profile.name }}</p>{% endif %}
-      </header>
-
-      <div class="prose">
-        {{ body }}
-      </div>
-
-      {% if article.medium_url %}
-        <p class="article-foot mono">Also on <a href="{{ article.medium_url }}" target="_blank" rel="noopener noreferrer">Medium <span aria-hidden="true">↗</span></a></p>
-      {% endif %}
-    </article>
+      </article>
+    </div>
   </main>
 {% endblock %}

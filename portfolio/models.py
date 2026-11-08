@@ -6,7 +6,12 @@ class Profile(models.Model):
 
     name = models.CharField(max_length=200)
     role = models.CharField(max_length=200)
-    intro = models.TextField()
+    intro = models.TextField(help_text="Short introduction on the home page.")
+    about = models.TextField(
+        blank=True,
+        help_text="Longer text for the About page; an empty line starts a new paragraph. "
+        "Leave empty to show the introduction there.",
+    )
     availability = models.CharField(
         max_length=200,
         blank=True,

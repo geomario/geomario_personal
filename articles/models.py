@@ -25,7 +25,7 @@ class Article(models.Model):
         choices=Post.Span.choices,
         default=Post.Span.SQUARE,
         blank=True,
-        help_text="Tile size on the Writing tab.",
+        help_text="Tile size on the Writing page.",
     )
     medium_url = models.URLField(
         blank=True, help_text="The Medium copy, once imported. Shown as a link at the end of the article."

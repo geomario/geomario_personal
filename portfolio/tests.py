@@ -8,9 +8,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase, override_settings
+from django.utils.html import escape
 
 from portfolio import data
-from portfolio.models import FocusArea, Post, ProfileLink, Project, TimelineEntry
+from portfolio.models import FocusArea, Post, Profile, ProfileLink, Project, TimelineEntry
 
 
 def run(command):
@@ -23,42 +24,82 @@ def run(command):
     **settings.STORAGES,
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 })
-class IndexTests(TestCase):
-    def test_renders_seeded_content(self):
-        run("load_initial_data")
+class PageTests(TestCase):
+    pages = {
+        "/about/": "About",
+        "/projects/": "Projects",
+        "/writing/": "Writing",
+        "/experience/": "Experience",
+    }
+
+    def test_every_page_renders_and_marks_its_nav_item(self):
         response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, data.PROJECTS[0]["name"])
-        self.assertContains(response, data.WRITING[0]["title"])
+        self.assertContains(response, 'aria-label="Mario Ramirez, home" aria-current="page"')
+        for url, label in self.pages.items():
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, f'<a href="{url}" aria-current="page">{label}</a>', html=True)
+
+    def test_renders_seeded_content(self):
+        run("load_initial_data")
+        self.assertContains(self.client.get("/projects/"), data.PROJECTS[0]["name"])
+        self.assertContains(self.client.get("/writing/"), data.WRITING[0]["title"])
+        self.assertContains(self.client.get("/experience/"), data.TIMELINE[0]["title"])
+        home = self.client.get("/")
+        self.assertContains(home, data.WRITING[0]["title"])
+        self.assertContains(home, data.TIMELINE[0]["org"])
+
+    def test_home_shows_only_the_latest_writing(self):
+        for i in range(6):
+            Post.objects.create(title=f"Post {i}", date="2024", source="Medium", url="https://x.example", excerpt="e")
+        home = self.client.get("/")
+        self.assertContains(home, "Post 3")
+        self.assertNotContains(home, "Post 4")
+        self.assertContains(self.client.get("/writing/"), "Post 5")
 
     def test_cannot_be_framed(self):
         response = self.client.get("/")
         self.assertEqual(response["X-Frame-Options"], "DENY")
 
     def test_shows_profile_and_links_from_migration(self):
-        response = self.client.get("/")
-        self.assertContains(response, "<h1>Mario Ramirez</h1>", html=True)
-        for link in ProfileLink.objects.all():
-            self.assertContains(response, f'href="{link.url}"')
-        self.assertContains(response, 'href="mailto:marm1984@gmail.com"')
+        for url in ("/", "/about/"):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertContains(response, "<h1>Mario Ramirez</h1>", html=True)
+                for link in ProfileLink.objects.all():
+                    self.assertContains(response, f'href="{link.url}"')
+                self.assertContains(response, 'href="mailto:marm1984@gmail.com"')
+
+    def test_about_text_falls_back_to_the_intro(self):
+        profile = Profile.objects.get()
+        profile.about = ""
+        profile.save()
+        self.assertContains(self.client.get("/about/"), escape(profile.intro))
+        profile.about = "First paragraph.\n\nSecond paragraph."
+        profile.save()
+        response = self.client.get("/about/")
+        self.assertContains(response, "<p>First paragraph.</p>", html=True)
+        self.assertContains(response, "<p>Second paragraph.</p>", html=True)
 
     def test_hides_focus_areas_without_projects(self):
         FocusArea.objects.create(name="Empty area")
         used = FocusArea.objects.create(name="Used area")
         Project.objects.create(name="P", tag=used, desc="d")
-        response = self.client.get("/")
+        response = self.client.get("/projects/")
         self.assertContains(response, 'data-filter="Used area"')
         self.assertNotContains(response, 'data-filter="Empty area"')
 
     def test_project_without_tag_or_url(self):
         Project.objects.create(name="Untagged", desc="d")
-        response = self.client.get("/")
+        response = self.client.get("/projects/")
         self.assertContains(response, 'data-tag=""')
         self.assertNotContains(response, "None")
 
     def test_project_url_is_a_link(self):
         Project.objects.create(name="Linked", desc="d", url="https://example.com/repo")
-        response = self.client.get("/")
+        response = self.client.get("/projects/")
         self.assertContains(response, 'href="https://example.com/repo"')
 
 
@@ -125,6 +166,20 @@ class UpdateProjectsTests(TestCase):
     def test_does_nothing_without_the_starter_projects(self):
         self.migration.update_projects(django_apps, None)
         self.assertFalse(Project.objects.exists())
+
+
+class AboutTextTests(TestCase):
+    migration = importlib.import_module("portfolio.migrations.0008_about_text")
+
+    def test_fills_only_an_empty_about(self):
+        profile = Profile.objects.get()
+        self.assertEqual(profile.about, self.migration.ABOUT)  # applied by the test database
+
+        profile.about = "Written in the admin."
+        profile.save()
+        self.migration.fill_about(django_apps, None)
+        profile.refresh_from_db()
+        self.assertEqual(profile.about, "Written in the admin.")
 
 
 class EnsureSuperuserTests(TestCase):
