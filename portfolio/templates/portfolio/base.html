@@ -6,7 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0b0c10" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="{% static 'portfolio/img/favicon.ico' %}" sizes="32x32">
   <link rel="icon" href="{% static 'portfolio/img/favicon.svg' %}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{% static 'portfolio/img/apple-touch-icon.png' %}">
   <title>{% block title %}{{ profile.name }} · {{ profile.role }}{% endblock %}</title>
   {% block meta %}<meta name="description" content="{{ profile.intro }}">{% endblock %}
   {# Apply a saved light/dark choice before the page is drawn, so it does not flash. #}

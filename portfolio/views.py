@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.templatetags.static import static
 
 from articles.models import Article
 
@@ -13,6 +14,12 @@ def writing_items():
 
 def page(request, template, active, **context):
     return render(request, template, {**site_context(), "active": active, **context})
+
+
+def favicon(request):
+    """Browsers ask for /favicon.ico directly; send them to the static file (not permanent,
+    because its hashed file name changes whenever the icon does)."""
+    return redirect(static("portfolio/img/favicon.ico"))
 
 
 def index(request):

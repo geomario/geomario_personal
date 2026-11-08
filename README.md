@@ -221,7 +221,9 @@ Most content is edited in the admin, under **Portfolio**:
 Each list has an **Order** column you can edit in place; lower numbers come first.
 
 Not in the admin: the photo (`portfolio/static/portfolio/img/mario-ramirez.jpg`, a 400×400
-JPEG; replace the file) and the "Current research infrastructure" card (in
+JPEG; replace the file), the browser icon (`img/favicon.svg`; `favicon.ico` and
+`apple-touch-icon.png` next to it are PNG renderings of it, so redo them if it changes) and
+the "Current research infrastructure" card (in
 `portfolio/templates/portfolio/_infra_card.html`, on the Experience page).
 
 `portfolio/data.py` is only starter content. It is loaded once, into an empty database, so

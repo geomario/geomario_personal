@@ -47,6 +47,11 @@ class PageTests(TestCase):
         self.assertContains(response, 'href="https://arxiv.org/abs/2610.41441"')
         self.assertContains(response, 'href="https://github.com/gesiscss/gesis_surf_extension"')
 
+    def test_favicon_address_redirects_to_the_icon(self):
+        response = self.client.get("/favicon.ico")
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(response["Location"].endswith("portfolio/img/favicon.ico"))
+
     def test_old_about_address_redirects_to_the_landing_page(self):
         self.assertRedirects(self.client.get("/about/"), "/", status_code=301)
 

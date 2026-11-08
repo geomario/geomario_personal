@@ -46,7 +46,9 @@ an **empty** database on container start, so editing it does not change a runnin
   come from the `Profile` and `ProfileLink` models (admin); only the infrastructure card
   is hard-coded.
   Link logos are SVGs in `portfolio/templates/portfolio/icons/<kind>.svg` (credits in
-  README). The photo is `portfolio/static/portfolio/img/mario-ramirez.jpg`.
+  README). The photo is `portfolio/static/portfolio/img/mario-ramirez.jpg`; the browser icon is
+  `img/favicon.svg`, with `favicon.ico` and `apple-touch-icon.png` rendered from it
+  (`/favicon.ico` redirects to the static file).
 - Content changes that must reach production go in data migrations (see
   `0003_initial_profile`, `0004_replace_seed_timeline`); `data.py` only seeds empty
   databases.
