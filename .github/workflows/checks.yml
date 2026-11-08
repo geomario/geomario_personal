@@ -18,7 +18,8 @@ permissions:
 jobs:
   test-lint:
     name: Test and Lint
-    runs-on: ubuntu-latest
+    # Pinned, so GitHub moving ubuntu-latest to a new release can't change CI unannounced.
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -39,7 +40,7 @@ jobs:
     name: Build image and deploy
     needs: test-lint
     if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.DEPLOY_HOST != ''
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     # Never run two deploys at once; a newer push waits for the running one.
     concurrency:
       group: production-deploy
