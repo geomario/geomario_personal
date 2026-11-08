@@ -1,7 +1,7 @@
 # Mario — portfolio (Django)
 
-A portfolio site with five pages (Home, About, Projects, Writing, Experience) and hosted
-articles. Django renders the pages from content stored in PostgreSQL, and you edit that
+A portfolio site with five pages (About, which is the landing page, Projects,
+Publications, Writing, Experience) and hosted articles. Django renders the pages from content stored in PostgreSQL, and you edit that
 content in the Django admin; article text is Markdown in the repository (see "Articles").
 The light/dark switch and the project filter chips use a small plain-JavaScript file; there
 is no frontend framework and no build step.
@@ -210,18 +210,19 @@ Most content is edited in the admin, under **Portfolio**:
 
 | Admin section | What it controls on the page |
 | --- | --- |
-| Profile | Name, title, intro (Home), the line above the name, About text (About page; empty shows the intro), location, organisation, email. There is exactly one |
-| Profile links | The logos on Home and in the footer, and the list on About (GitHub, LinkedIn, ORCID, ResearchGate, Medium) |
+| Profile | The landing page: name, title, the line above the name, About text, location, organisation, email. The short intro is the search-engine description (and shows when About text is empty). There is exactly one |
+| Profile links | The list beside the photo and the logos in the footer (GitHub, LinkedIn, ORCID, ResearchGate, Medium) |
 | Focus areas | The filter chips on the Projects page (an area without projects gets no chip) |
 | Projects | Project cards: name, focus area (tag), description, stack (a JSON list such as `["Python", "Django"]`), optional link |
-| Posts | Tiles on the Writing page (the first few also on Home, after published articles). **Span** sets the tile shape: square, wide (2×1), tall (1×2) or feature (2×2) |
-| Timeline entries | The Experience page and the Work card on Home. **When** is the field ("Research", "Legal tech"…), not a date |
+| Posts | Tiles on the Writing page (the landing page's "Latest writing" badge names the newest published article, or the first post when there is none). **Span** sets the tile shape: square, wide (2×1), tall (1×2) or feature (2×2) |
+| Publications | The Publications page: title, authors, venue, year, status (published, under review, preprint), link (DOI or arXiv) and optional code link |
+| Timeline entries | The Experience page. **When** is the field ("Research", "Legal tech"…), not a date |
 
 Each list has an **Order** column you can edit in place; lower numbers come first.
 
 Not in the admin: the photo (`portfolio/static/portfolio/img/mario-ramirez.jpg`, a 400×400
 JPEG; replace the file) and the "Current research infrastructure" card (in
-`portfolio/templates/portfolio/_infra_card.html`, shown on Home and Experience).
+`portfolio/templates/portfolio/_infra_card.html`, on the Experience page).
 
 `portfolio/data.py` is only starter content. It is loaded once, into an empty database, so
 editing it later changes nothing on a running site.
@@ -290,11 +291,12 @@ only.
 
 - `mario_portfolio/settings.py`: settings (environment-driven)
 - `portfolio/models.py`, `portfolio/admin.py`: the content models and their admin pages
-- `portfolio/views.py`, `portfolio/urls.py`: the five pages
+- `portfolio/views.py`, `portfolio/urls.py`: the five pages (`/about/` redirects to `/`)
 - `portfolio/templates/portfolio/base.html`: shared layout (head, header with the pill
   navigation and theme switch, footer) for every page
-- `portfolio/templates/portfolio/`: `index.html` (Home), `about.html`, `projects.html`,
-  `writing.html`, `experience.html`, plus `_tile.html` (one Writing tile) and
+- `portfolio/templates/portfolio/`: `index.html` (About, the landing page), `projects.html`,
+  `writing.html`, `publications.html`, `experience.html`, plus `_nav_links.html` (the menu,
+  used by the pill and by the narrow-screen Menu), `_tile.html` (one Writing tile) and
   `_infra_card.html`
 - `portfolio/site.py`: context every page needs (profile and links for the footer)
 - `articles/`: hosted articles: model and admin, `rendering.py` (Markdown to HTML),
@@ -302,7 +304,7 @@ only.
   `content/<slug>/` (the articles themselves), `tests.py`
 - `portfolio/static/portfolio/css/style.css`: all styles (slate with a teal accent, light and dark themes; the gradient rule is at the top)
 - `portfolio/static/portfolio/fonts/`: self-hosted fonts (no requests to Google or other third parties)
-- `portfolio/static/portfolio/js/app.js`: theme switch, focus-area filter, pointer glow
+- `portfolio/static/portfolio/js/app.js`: theme switch, closing the narrow-screen Menu, focus-area filter, pointer glow
 - `portfolio/data.py` + `portfolio/management/commands/load_initial_data.py`: starter content
 - `portfolio/management/commands/ensure_superuser.py`: creates the admin user on start
 - `portfolio/tests.py`, `articles/tests.py`: tests

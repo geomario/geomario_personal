@@ -154,12 +154,14 @@ class WritingListTests(ContentDirTestCase):
     def test_shows_published_articles_only(self):
         self.article(slug="live", title="Live article", is_published=True)
         self.article(slug="draft", title="Draft article")
-        for url in ("/", "/writing/"):
-            with self.subTest(url=url):
-                response = self.client.get(url)
-                self.assertContains(response, 'href="/writing/live/"')
-                self.assertContains(response, "Live article")
-                self.assertNotContains(response, "Draft article")
+        response = self.client.get("/writing/")
+        self.assertContains(response, 'href="/writing/live/"')
+        self.assertContains(response, "Live article")
+        self.assertNotContains(response, "Draft article")
+        # The landing page badge names the newest published piece.
+        response = self.client.get("/")
+        self.assertContains(response, "Live article")
+        self.assertNotContains(response, "Draft article")
 
 
 @override_settings(STORAGES=PLAIN_STATIC)

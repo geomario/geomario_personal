@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import FocusArea, Post, Profile, ProfileLink, Project, TimelineEntry
+from .models import FocusArea, Post, Profile, ProfileLink, Project, Publication, TimelineEntry
 
 
 @admin.register(Profile)
@@ -48,3 +48,11 @@ class PostAdmin(admin.ModelAdmin):
     list_editable = ("order", "span")
     list_filter = ("span",)
     search_fields = ("title", "source")
+
+
+@admin.register(Publication)
+class PublicationAdmin(admin.ModelAdmin):
+    list_display = ("title", "venue", "year", "status", "order")
+    list_editable = ("status", "order")
+    list_filter = ("status", "year")
+    search_fields = ("title", "authors", "venue")

@@ -2,7 +2,7 @@
 
 ## Project
 
-Mario's portfolio site (Home, About, Projects, Writing, Experience) with hosted articles. Django 5 (apps `portfolio` and
+Mario's portfolio site (About as the landing page, Projects, Publications, Writing, Experience) with hosted articles. Django 5 (apps `portfolio` and
 `articles`), server-rendered
 templates, plain JavaScript (no framework, no build step), PostgreSQL 16, Python 3.13.
 Development: `docker-compose.yml` (code mounted, `runserver`). Production:
@@ -41,7 +41,8 @@ an **empty** database on container start, so editing it does not change a runnin
 - Templates: `portfolio/templates/portfolio/base.html` (shared head, header with the pill
   navigation and theme switch, footer; pages get `profile`/`links` from
   `portfolio/site.py` and `active` from their view) and one template per page
-  (`index.html` is Home), plus `_tile.html` and `_infra_card.html`. Profile text and links
+  (`index.html` is the About landing page), plus `_nav_links.html` (shared by the pill nav and
+  the narrow-screen Menu), `_tile.html` and `_infra_card.html`. Profile text and links
   come from the `Profile` and `ProfileLink` models (admin); only the infrastructure card
   is hard-coded.
   Link logos are SVGs in `portfolio/templates/portfolio/icons/<kind>.svg` (credits in
@@ -60,7 +61,7 @@ an **empty** database on container start, so editing it does not change a runnin
   `skills-lock.json`. Use `web-design-guidelines` to review UI changes. Add skills one at a
   time with `npx skills add <repo> --skill <name> -a claude-code -a github-copilot`, and
   read their files before committing.
-- Interactivity: `portfolio/static/portfolio/js/app.js` (theme switch, focus-area filter, pointer glow)
+- Interactivity: `portfolio/static/portfolio/js/app.js` (theme switch, Menu closing, focus-area filter, pointer glow)
 - Production start-up: `scripts/run.sh` (migrate, seed, `ensure_superuser`, gunicorn).
   Static files are collected at image build time into `/vol/static` (`Dockerfile`) and
   served by whitenoise.

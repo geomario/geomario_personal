@@ -26,60 +26,64 @@ def run(command):
 })
 class PageTests(TestCase):
     pages = {
-        "/about/": "About",
+        "/": "About",
         "/projects/": "Projects",
         "/writing/": "Writing",
+        "/publications/": "Publications",
         "/experience/": "Experience",
     }
 
     def test_every_page_renders_and_marks_its_nav_item(self):
-        response = self.client.get("/")
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'aria-label="Mario Ramirez, home" aria-current="page"')
         for url, label in self.pages.items():
             with self.subTest(url=url):
                 response = self.client.get(url)
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, f'<a href="{url}" aria-current="page">{label}</a>', html=True)
 
+    def test_publications_show_the_paper_from_migration(self):
+        response = self.client.get("/publications/")
+        self.assertContains(response, "GESIS Surf: An Open-Source Infrastructure")
+        self.assertContains(response, "Submitted to SoftwareX")
+        self.assertContains(response, 'href="https://arxiv.org/abs/2610.41441"')
+        self.assertContains(response, 'href="https://github.com/gesiscss/gesis_surf_extension"')
+
+    def test_old_about_address_redirects_to_the_landing_page(self):
+        self.assertRedirects(self.client.get("/about/"), "/", status_code=301)
+
     def test_renders_seeded_content(self):
         run("load_initial_data")
         self.assertContains(self.client.get("/projects/"), data.PROJECTS[0]["name"])
         self.assertContains(self.client.get("/writing/"), data.WRITING[0]["title"])
         self.assertContains(self.client.get("/experience/"), data.TIMELINE[0]["title"])
-        home = self.client.get("/")
-        self.assertContains(home, data.WRITING[0]["title"])
-        self.assertContains(home, data.TIMELINE[0]["org"])
+        self.assertContains(self.client.get("/"), data.WRITING[0]["title"])
 
-    def test_home_shows_only_the_latest_writing(self):
-        for i in range(6):
+    def test_landing_page_points_to_the_newest_writing(self):
+        for i in range(3):
             Post.objects.create(title=f"Post {i}", date="2024", source="Medium", url="https://x.example", excerpt="e")
-        home = self.client.get("/")
-        self.assertContains(home, "Post 3")
-        self.assertNotContains(home, "Post 4")
-        self.assertContains(self.client.get("/writing/"), "Post 5")
+        landing = self.client.get("/")
+        self.assertContains(landing, '<span class="latest-title">Post 0</span>', html=True)
+        self.assertNotContains(landing, "Post 1")
+        self.assertContains(self.client.get("/writing/"), "Post 2")
 
     def test_cannot_be_framed(self):
         response = self.client.get("/")
         self.assertEqual(response["X-Frame-Options"], "DENY")
 
     def test_shows_profile_and_links_from_migration(self):
-        for url in ("/", "/about/"):
-            with self.subTest(url=url):
-                response = self.client.get(url)
-                self.assertContains(response, "<h1>Mario Ramirez</h1>", html=True)
-                for link in ProfileLink.objects.all():
-                    self.assertContains(response, f'href="{link.url}"')
-                self.assertContains(response, 'href="mailto:marm1984@gmail.com"')
+        response = self.client.get("/")
+        self.assertContains(response, "<h1>Mario Ramirez</h1>", html=True)
+        for link in ProfileLink.objects.all():
+            self.assertContains(response, f'href="{link.url}"')
+        self.assertContains(response, 'href="mailto:marm1984@gmail.com"')
 
     def test_about_text_falls_back_to_the_intro(self):
         profile = Profile.objects.get()
         profile.about = ""
         profile.save()
-        self.assertContains(self.client.get("/about/"), escape(profile.intro))
+        self.assertContains(self.client.get("/"), f"<p>{escape(profile.intro)}</p>", html=True)
         profile.about = "First paragraph.\n\nSecond paragraph."
         profile.save()
-        response = self.client.get("/about/")
+        response = self.client.get("/")
         self.assertContains(response, "<p>First paragraph.</p>", html=True)
         self.assertContains(response, "<p>Second paragraph.</p>", html=True)
 
@@ -180,6 +184,22 @@ class AboutTextTests(TestCase):
         self.migration.fill_about(django_apps, None)
         profile.refresh_from_db()
         self.assertEqual(profile.about, "Written in the admin.")
+
+
+class BrainTimelineEntryTests(TestCase):
+    migration = importlib.import_module("portfolio.migrations.0011_brain_timeline_entry")
+
+    def test_goes_between_cologne_and_finerio(self):
+        for i, org in enumerate(["GESIS", "University of Cologne", "Finerio Connect", "GeoLegalTech GmbH"]):
+            TimelineEntry.objects.create(when="x", title=f"t{i}", org=org, body="b", order=i)
+        self.migration.add_entry(django_apps, None)
+        self.migration.add_entry(django_apps, None)  # a second run adds nothing
+        orgs = list(TimelineEntry.objects.values_list("org", flat=True))
+        self.assertEqual(orgs, ["GESIS", "University of Cologne", "BRAIN", "Finerio Connect", "GeoLegalTech GmbH"])
+
+    def test_leaves_an_empty_timeline_to_the_seed_data(self):
+        self.migration.add_entry(django_apps, None)
+        self.assertFalse(TimelineEntry.objects.exists())
 
 
 class EnsureSuperuserTests(TestCase):

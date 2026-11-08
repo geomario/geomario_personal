@@ -1,0 +1,37 @@
+{% extends "portfolio/base.html" %}
+
+{% block title %}Publications · {{ profile.name }}{% endblock %}
+{% block meta %}<meta name="description" content="Papers and preprints by {{ profile.name }}.">{% endblock %}
+
+{% block content %}
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <h1>Publications</h1>
+      <p class="lead">Papers, preprints and the software behind them.</p>
+    </header>
+
+    {% if publications %}
+      <ol class="pub-list">
+        {% for pub in publications %}
+          <li class="pub">
+            <p class="pub-year">{{ pub.year }}</p>
+            <div>
+              <p class="pub-status">
+                <span class="tag{% if pub.status != "published" %} pending{% endif %}">{{ pub.get_status_display }}</span>
+                {% if pub.venue %}<span class="pub-venue">{% if pub.status == "under_review" %}Submitted to {% endif %}{{ pub.venue }}</span>{% endif %}
+              </p>
+              <h2><a href="{{ pub.url }}" target="_blank" rel="noopener noreferrer">{{ pub.title }}</a></h2>
+              <p class="pub-authors">{{ pub.authors }}</p>
+              <p class="pub-links">
+                <a href="{{ pub.url }}" target="_blank" rel="noopener noreferrer">{% if pub.status == "published" %}Read the paper{% else %}Read the preprint{% endif %} <span aria-hidden="true">↗</span></a>
+                {% if pub.code_url %}<a href="{{ pub.code_url }}" target="_blank" rel="noopener noreferrer">Code <span aria-hidden="true">↗</span></a>{% endif %}
+              </p>
+            </div>
+          </li>
+        {% endfor %}
+      </ol>
+    {% else %}
+      <p class="empty-note">Nothing here yet.</p>
+    {% endif %}
+  </main>
+{% endblock %}

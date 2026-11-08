@@ -1,0 +1,5 @@
+<a href="{% url 'index' %}"{% if active == "about" %} aria-current="page"{% endif %}>About</a>
+<a href="{% url 'projects' %}"{% if active == "projects" %} aria-current="page"{% endif %}>Projects</a>
+<a href="{% url 'publications' %}"{% if active == "publications" %} aria-current="page"{% endif %}>Publications</a>
+<a href="{% url 'writing' %}"{% if active == "writing" %} aria-current="page"{% endif %}>Writing</a>
+<a href="{% url 'experience' %}"{% if active == "experience" %} aria-current="page"{% endif %}>Experience</a>

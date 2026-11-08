@@ -2,10 +2,8 @@ from django.shortcuts import render
 
 from articles.models import Article
 
-from .models import FocusArea, Post, Project, TimelineEntry
+from .models import FocusArea, Post, Project, Publication, TimelineEntry
 from .site import site_context
-
-HOME_TILES = 4
 
 
 def writing_items():
@@ -18,17 +16,9 @@ def page(request, template, active, **context):
 
 
 def index(request):
-    return page(
-        request,
-        "portfolio/index.html",
-        "home",
-        latest=writing_items()[:HOME_TILES],
-        timeline=TimelineEntry.objects.all(),
-    )
-
-
-def about(request):
-    return page(request, "portfolio/about.html", "about")
+    """The landing page is the About page, with a badge pointing to the newest writing."""
+    items = writing_items()
+    return page(request, "portfolio/index.html", "about", latest=items[0] if items else None)
 
 
 def projects(request):
@@ -44,6 +34,10 @@ def projects(request):
 
 def writing(request):
     return page(request, "portfolio/writing.html", "writing", items=writing_items())
+
+
+def publications(request):
+    return page(request, "portfolio/publications.html", "publications", publications=Publication.objects.all())
 
 
 def experience(request):

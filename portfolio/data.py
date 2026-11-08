@@ -44,6 +44,18 @@ TIMELINE = [
         ),
     },
     {
+        "when": "Market research",
+        "title": "Co-Lead, Data Infrastructure & Machine Learning",
+        "org": "BRAIN",
+        "location": "Mexico City (remote)",
+        "body": (
+            "Co-led the design and build of the company's entire market research "
+            "infrastructure, from data collection to the pipelines and machine-learning "
+            "models behind its consumer, shopper and brand studies, turning research data "
+            "into insights for clients."
+        ),
+    },
+    {
         "when": "Open finance",
         "title": "Senior Full Stack & Data Developer",
         "org": "Finerio Connect",

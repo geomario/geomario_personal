@@ -1,10 +1,12 @@
 // Small progressive enhancements; every page works without them.
 // - the light/dark theme switch (a saved choice is applied by an inline script in <head>)
+// - closing the narrow-screen Menu on Escape or a click outside it
 // - the focus-area filter on the Projects page
 // - a soft light that follows the mouse
 
 document.addEventListener("DOMContentLoaded", () => {
   initThemeToggle();
+  initMenu();
   initFocusFilter();
   initPointerGlow();
 });
@@ -37,6 +39,20 @@ function initThemeToggle() {
   systemDark.addEventListener("change", sync);
   sync();
   button.hidden = false;
+}
+
+function initMenu() {
+  const menu = document.querySelector(".menu");
+  if (!menu) return;
+  document.addEventListener("click", (event) => {
+    if (menu.open && !menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      menu.querySelector("summary").focus();
+    }
+  });
 }
 
 function initFocusFilter() {
